@@ -7,4 +7,9 @@ URL Shortener for the course of web engineering
  - [Fernando Bercedo](https://github.com/ferbercedo)
  - [Guillermo Perez](https://github.com/Guillerm097)
 
-[![Build Status](https://travis-ci.org/sherrero96/Tiny.on.svg?branch=master)](https://travis-ci.org/sherrero96/Tiny.on)
+## Project
+
+| Branch | Build
+|:------:||:------:|
+| master |[![Build Status](https://travis-ci.org/sherrero96/Tiny.on.svg?branch=master)](https://travis-ci.org/sherrero96/Tiny.on)
+
