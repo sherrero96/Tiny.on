@@ -23,7 +23,7 @@ public class UrlShortenerController {
     private final ClickService clickService;
 
     @Autowired
-    private URIAvailable availableURI;  // To check if a URI is reachable
+    private URIAvailable availableURI = new URIAvailable();  // To check if a URI is reachable
 
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
