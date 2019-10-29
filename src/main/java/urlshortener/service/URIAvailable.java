@@ -18,7 +18,8 @@ public class URIAvailable {
      * @return True if the uri is reachable, false in other cases.
      */
     public boolean isURIAvailable(@NonNull String uri){
-        return getURIResponseGet(uri) != -1;
+        // If the response is not 2XX Http response, then will we assume it's unreachable.
+        return (getURIResponseGet(uri)/100) != 2;
     }
 
     /**
