@@ -1,6 +1,7 @@
 package urlshortener.web;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
+import urlshortener.service.URIAvailable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -19,6 +21,9 @@ public class UrlShortenerController {
     private final ShortURLService shortUrlService;
 
     private final ClickService clickService;
+
+    @Autowired
+    private URIAvailable availableURI;  // To check if a URI is reachable
 
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
@@ -43,7 +48,9 @@ public class UrlShortenerController {
                                               HttpServletRequest request) {
         UrlValidator urlValidator = new UrlValidator(new String[]{"http",
                 "https"});
-        if (urlValidator.isValid(url)) {
+
+        // If the uri is valid and reachable, it is shortened.
+        if (urlValidator.isValid(url) && availableURI.isURIAvailable(url)) {
             ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
             HttpHeaders h = new HttpHeaders();
             h.setLocation(su.getUri());
