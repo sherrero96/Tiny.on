@@ -12,5 +12,5 @@ URL Shortener for the course of web engineering
 
 | Branch | Build |
 |--------|-------|
-| master |[![Build Status](https://travis-ci.org/sherrero96/Tiny.on.svg?branch=master)](https://travis-ci.org/sherrero96/Tiry.on)|
+| master |[![Build Status](https://travis-ci.org/sherrero96/Tiry.on.svg?branch=master)](https://travis-ci.org/sherrero96/Tiry.on)|
 
