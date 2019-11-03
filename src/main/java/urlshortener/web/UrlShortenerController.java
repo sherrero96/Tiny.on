@@ -10,6 +10,7 @@ import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 import urlshortener.service.URIAvailable;
+import urlshortener.service.QRCode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -57,6 +58,19 @@ public class UrlShortenerController {
             return new ResponseEntity<>(su, h, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/linkQRCode", method = RequestMethod.POST)
+    public ResponseEntity<String> showQRImage (@RequestParam("url") String url, HttpServletRequest request) {
+        UrlValidator urlValidator = new UrlValidator(new String[]{"http",
+                "https"});
+
+        if (urlValidator.isValid(url) && availableURI.isURIAvailable(url)) {
+            String url_qrcode = QRCode.getQRCode(url);
+            return new ResponseEntity<String>(url_qrcode, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
     }
 

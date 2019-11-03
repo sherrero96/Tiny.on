@@ -21,4 +21,21 @@ $(document).ready(
                     }
                 });
             });
+
+            $("#shortenerQR").submit(
+                function (event) {
+                    event.preventDefault();
+                    $.ajax({
+                        type: "POST",
+                        url: "/linkQRCode",
+                        data: $(this).serialize(),
+                        success: function (msg) {
+                            window.location.replace(msg);
+                        },
+                        error: function () {
+                            $("#result").html(
+                                "<div class='alert alert-danger lead'>ERROR</div>");
+                        }
+                    });
+                });
     });
