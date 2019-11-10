@@ -1,20 +1,30 @@
 package urlshortener.web;
 
+import org.springframework.web.context.support.ServletContextResource;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.util.StreamUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
 import urlshortener.service.ShortURLService;
 import urlshortener.service.URIAvailable;
+import urlshortener.service.QRCode;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
+import javax.servlet.http.HttpServletResponse;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
 @RestController
 public class UrlShortenerController {
@@ -23,7 +33,10 @@ public class UrlShortenerController {
     private final ClickService clickService;
 
     @Autowired
-    private URIAvailable availableURI = new URIAvailable();  // To check if a URI is reachable
+    private URIAvailable availableURI = new URIAvailable(); // To check if a URI is reachable
+
+    @Autowired
+    private QRCode qrCode = new QRCode();
 
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
@@ -31,8 +44,7 @@ public class UrlShortenerController {
     }
 
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
-    public ResponseEntity<?> redirectTo(@PathVariable String id,
-                                        HttpServletRequest request) {
+    public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
         if (l != null) {
             clickService.saveClick(id, extractIP(request));
@@ -42,12 +54,21 @@ public class UrlShortenerController {
         }
     }
 
+    @RequestMapping(value = "/qr", method = RequestMethod.GET)
+    public void qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
+        ShortURL l = shortUrlService.findByKey(id);
+        if (l != null) {
+            String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+            InputStream in = qrCode.getQRImageAsStream(baseUrl + id);
+            response.setContentType(MediaType.IMAGE_PNG_VALUE);
+            IOUtils.copy(in, response.getOutputStream());
+        }
+    }
+
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-                                              @RequestParam(value = "sponsor", required = false) String sponsor,
-                                              HttpServletRequest request) {
-        UrlValidator urlValidator = new UrlValidator(new String[]{"http",
-                "https"});
+            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+        UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 
         // If the uri is valid and reachable, it is shortened.
         if (urlValidator.isValid(url) && availableURI.isURIAvailable(url)) {
