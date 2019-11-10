@@ -13,7 +13,10 @@ $(document).ready(
                             + msg.uri
                             + "'>"
                             + msg.uri
-                            + "</a></div>");
+                            + "</a></div>"
+                            + "<img src="
+                            + getQRUri(msg.uri)
+                            + " class=img-fluid >");
                     },
                     error: function () {
                         $("#result").html(
@@ -21,21 +24,11 @@ $(document).ready(
                     }
                 });
             });
-
-            $("#shortenerQR").submit(
-                function (event) {
-                    event.preventDefault();
-                    $.ajax({
-                        type: "POST",
-                        url: "/linkQRCode",
-                        data: $(this).serialize(),
-                        success: function (msg) {
-                            window.location.replace(msg);
-                        },
-                        error: function () {
-                            $("#result").html(
-                                "<div class='alert alert-danger lead'>ERROR</div>");
-                        }
-                    });
-                });
     });
+
+    function getQRUri(uri) {
+      // var base_uri = uri.split('/')[0];
+      var id = uri.split('/').pop();
+
+      return window.location.origin + "/qr?id=" + id;
+    }
