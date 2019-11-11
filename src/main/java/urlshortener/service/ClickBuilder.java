@@ -43,6 +43,11 @@ public class ClickBuilder {
         return this;
     }
 
+    ClickBuilder browser(String browser){
+        this.browser = browser;
+        return this;
+    }
+
     ClickBuilder unknownPlatform() {
         this.platform = null;
         return this;
@@ -51,6 +56,11 @@ public class ClickBuilder {
 
     ClickBuilder ip(String ip) {
         this.ip = ip;
+        return this;
+    }
+
+    ClickBuilder country(String country){
+        this.country = country;
         return this;
     }
 

@@ -1,27 +1,31 @@
 package urlshortener.web;
 
-import org.springframework.web.context.support.ServletContextResource;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.data.util.StreamUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
+import urlshortener.service.QRCode;
 import urlshortener.service.ShortURLService;
 import urlshortener.service.URIAvailable;
-import urlshortener.service.QRCode;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -47,12 +51,15 @@ public class UrlShortenerController {
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
         if (l != null) {
-            clickService.saveClick(id, extractIP(request));
+            // Obtain all the information about the request and save in the DB
+            clickService.saveClick(id, extractIP(request), extractCountry(request), "Windows");
             return createSuccessfulRedirectToResponse(l);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
 
     @RequestMapping(value = "/qr", method = RequestMethod.GET)
     public void qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
@@ -81,10 +88,45 @@ public class UrlShortenerController {
         }
     }
 
+    /**
+     * Return the remote ip address of the request
+     * @param request The user request
+     * @return The remote ip address
+     */
     private String extractIP(HttpServletRequest request) {
         return request.getRemoteAddr();
     }
 
+    /**
+     * Return the country of the request, using a API geoLocation
+     * @param request The request
+     * @return string with the country of the request
+     */
+    private String extractCountry(HttpServletRequest request){
+        HttpRequestBase httpReq = new HttpGet("http://ip-api.com/json/"+request.getRemoteAddr());
+        HttpClient httpclient = HttpClientBuilder.create().build();
+        HttpResponse response = null;
+        String result = "Unknown";
+        try {
+            response = httpclient.execute(httpReq); // Execute the petition
+            HttpEntity responseEntity = response.getEntity();
+            if(responseEntity != null){
+                String retSrc = EntityUtils.toString(responseEntity);
+                // Parse json
+                JSONObject json = new JSONObject(retSrc); //Convert String to JSON Object
+                result = json.getString("country");
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * Returns the redirection of the shortened web page
+     * @param l shortUrl
+     * @return web page
+     */
     private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
         HttpHeaders h = new HttpHeaders();
         h.setLocation(URI.create(l.getTarget()));
