@@ -66,7 +66,7 @@ public class UrlShortenerController {
         ShortURL l = shortUrlService.findByKey(id);
         if (l != null) {
             String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-            InputStream in = qrCode.getQRImageAsStream(baseUrl + id);
+            InputStream in = qrCode.getQRImageAsStream(baseUrl + '/' + id);
             response.setContentType(MediaType.IMAGE_PNG_VALUE);
             IOUtils.copy(in, response.getOutputStream());
         }
