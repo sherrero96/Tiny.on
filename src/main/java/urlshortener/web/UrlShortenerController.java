@@ -1,5 +1,6 @@
 package urlshortener.web;
 
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -7,6 +8,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.RequestUserAgent;
 import org.apache.http.util.EntityUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONException;
@@ -52,7 +54,8 @@ public class UrlShortenerController {
         ShortURL l = shortUrlService.findByKey(id);
         if (l != null) {
             // Obtain all the information about the request and save in the DB
-            clickService.saveClick(id, extractIP(request), extractCountry(request), "Windows");
+            clickService.saveClick(id, extractIP(request), extractCountry(request),
+                    extractPlatform(request));
             return createSuccessfulRedirectToResponse(l);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -117,9 +120,14 @@ public class UrlShortenerController {
                 result = json.getString("country");
             }
         } catch (IOException | JSONException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return result;
+    }
+
+    private String extractPlatform(HttpServletRequest request){
+        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+        return userAgent.getOperatingSystem().getName();
     }
 
     /**

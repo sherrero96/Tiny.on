@@ -43,8 +43,8 @@ public class ClickBuilder {
         return this;
     }
 
-    ClickBuilder browser(String browser){
-        this.browser = browser;
+    ClickBuilder platform(String platform){
+        this.platform = platform;
         return this;
     }
 
