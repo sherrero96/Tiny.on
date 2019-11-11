@@ -1,6 +1,6 @@
 $(document).ready(
     function () {
-        $("result").html(
+        $("result2").html(
             "<table class=\"table table-sm\">"
             + "<tbody>"
             + "<tr>"

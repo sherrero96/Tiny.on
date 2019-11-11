@@ -1,16 +1,11 @@
 package urlshortener.service;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 @RestController
@@ -23,11 +18,16 @@ public class StatsService {
     }
 
     @RequestMapping(value = "/{id:(?!link|index).*}/stats", method = RequestMethod.GET)
-    public void prueba(@PathVariable String id) {
+    public String obtainStats(@PathVariable String id, HttpServletResponse response) {
         ArrayList<String> lastClick = clickService.obtainLastStats(id);
-        // For debug
-        for(String aux : lastClick){
-            System.out.println(aux);
-        }
+        // TODO: Preguntar a Javier como se hace la redirección a web html
+        // return redirection to stats.html
+        // Now we write in the output standard
+        String result = "";
+        result = result + "Nº of visits: \t" + lastClick.get(0) + "\n";
+        result = result + "IP address last visit: \t" + lastClick.get(1) + "\n";
+        result = result + "Location last visit: \t" + lastClick.get(2) + "\n";
+        result = result + "Platform last visit: \t" + lastClick.get(3) + "\n";
+        return result;
     }
 }

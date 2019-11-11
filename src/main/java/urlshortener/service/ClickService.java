@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import urlshortener.domain.Click;
 import urlshortener.repository.ClickRepository;
 
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
