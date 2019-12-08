@@ -1,10 +1,13 @@
 package urlshortener.service;
 
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Class to check if a URI is reachable.
@@ -12,6 +15,18 @@ import java.net.URL;
 @Service
 public class URIAvailable {
 
+    // Time between check and check
+    private static final int TIME_URI_CHECK = 5000;
+
+    private ConcurrentHashMap<String, AtomicBoolean> map = new ConcurrentHashMap<>();
+
+    /**
+     * Update the map
+     */
+    @Scheduled(fixedRate = TIME_URI_CHECK)
+    public void checkUris(){
+
+    }
     /**
      * Returns true if and only if the uri is reachable, false in other cases.
      * @param uri The uri to check
