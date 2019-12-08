@@ -18,10 +18,13 @@ public class URIAvailable {
     // Time between check and check
     private static final int TIME_URI_CHECK = 5000;
 
+    // Timeout get petition
+    private static final int TIME_GET = 1000;
+
     private ConcurrentHashMap<String, AtomicBoolean> map = new ConcurrentHashMap<>();
 
     /**
-     * Update the map
+     * Update the booleans of the hashmap
      */
     @Scheduled(fixedRate = TIME_URI_CHECK)
     public void checkUris(){
@@ -29,7 +32,7 @@ public class URIAvailable {
     }
 
     /**
-     * Save the uri in the hashmap
+     * Save the uri in the hashmap for check
      * @param uri
      */
     public void saveURI(String uri){
@@ -39,7 +42,7 @@ public class URIAvailable {
     }
 
     /**
-     * Check if the uri is available
+     * Check if the uri is available, searching in the hashmap or get petition
      * @param uri
      * @return
      */
@@ -75,11 +78,14 @@ public class URIAvailable {
             HttpURLConnection httpConnection = (HttpURLConnection) new URL(uri).openConnection();
             // We make a request only to get the header
             httpConnection.setRequestMethod("HEAD");
+            // Connect Timeout
+            httpConnection.setConnectTimeout(TIME_GET);
+            // Read Timeout
+            httpConnection.setReadTimeout(TIME_GET);
             // We return the code that has arrived from the request.
             return httpConnection.getResponseCode();
         }catch(Exception e){
             // In case of error, we return -1
-            //System.out.println(e);
             return -1;
         }
     }

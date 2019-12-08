@@ -51,12 +51,16 @@ public class UrlShortenerController {
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
-        if (l != null) {
-            // Obtain all the information about the request and save in the DB
-            clickService.saveClick(id, extractIP(request), extractCountry(request),
-                    extractPlatform(request));
-            return createSuccessfulRedirectToResponse(l);
-        } else {
+        if(l != null){
+            if(availableURI.isURIAvailable(l.getTarget())){
+                // Obtain all the information about the request and save in the DB
+                clickService.saveClick(id, extractIP(request), extractCountry(request),
+                        extractPlatform(request));
+                return createSuccessfulRedirectToResponse(l);
+            }else{
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -81,6 +85,8 @@ public class UrlShortenerController {
 
         // If the uri is valid and reachable, it is shortened.
         if (urlValidator.isValid(url) && availableURI.isURIAvailable(url)) {
+            // Save the state in the available
+            availableURI.saveURI(url);
             ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
             HttpHeaders h = new HttpHeaders();
             h.setLocation(su.getUri());
