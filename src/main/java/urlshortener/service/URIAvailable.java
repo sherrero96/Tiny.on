@@ -25,14 +25,40 @@ public class URIAvailable {
      */
     @Scheduled(fixedRate = TIME_URI_CHECK)
     public void checkUris(){
-
+        map.forEach((uri, state) -> state.set(checkUriAvailable(uri)));
     }
+
+    /**
+     * Save the uri in the hashmap
+     * @param uri
+     */
+    public void saveURI(String uri){
+        if(!map.containsKey(uri)){
+            map.put(uri, new AtomicBoolean(checkUriAvailable(uri)));
+        }
+    }
+
+    /**
+     * Check if the uri is available
+     * @param uri
+     * @return
+     */
+    public boolean isURIAvailable(String uri){
+        boolean isAvailable = false;
+        if(map.containsKey(uri)){
+            isAvailable =  map.get(uri).get();
+        }else{
+            isAvailable = checkUriAvailable(uri);
+        }
+        return isAvailable;
+    }
+
     /**
      * Returns true if and only if the uri is reachable, false in other cases.
      * @param uri The uri to check
      * @return True if the uri is reachable, false in other cases.
      */
-    public boolean isURIAvailable(@NonNull String uri){
+    private boolean checkUriAvailable(@NonNull String uri){
         // If the response is not 2XX Http response, then will we assume it's unreachable.
         return (getURIResponseGet(uri)/100) == 2;
     }
