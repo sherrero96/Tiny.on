@@ -15,6 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class URIAvailable {
 
+    // List of error codes admited by the checker
+    private static final int[] errorCodesOK= {200, 201, 204};
+
     // Time between check and check
     private static final int TIME_URI_CHECK = 5000;
 
@@ -62,8 +65,14 @@ public class URIAvailable {
      * @return True if the uri is reachable, false in other cases.
      */
     private boolean checkUriAvailable(@NonNull String uri){
-        // If the response is not 2XX Http response, then will we assume it's unreachable.
-        return (getURIResponseGet(uri)/100) == 2;
+        int response = getURIResponseGet(uri);
+        for (int value : errorCodesOK) {
+            if (response == value) {
+                return true;
+            }
+        }
+        // Generate a error because uri is not available
+        return false;
     }
 
     /**
