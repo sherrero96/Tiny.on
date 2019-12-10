@@ -157,7 +157,7 @@ public class UrlShortenerController {
 
 //ResponseEntity<InputStreamResource>
     @RequestMapping(value = "/csv", method = RequestMethod.POST)
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
+    public int[] handleFileUpload(@RequestParam("file") MultipartFile file,
                                                      RedirectAttributes redirectAttributes) throws IOException {
         System.out.println(file.getInputStream());
         System.out.println("Empieza la función");
@@ -182,16 +182,18 @@ public class UrlShortenerController {
                 .body(resource);
 
 */
-        return "http://localhost:8080/download";
+        //return "http://localhost:8080/download";
 
 
 
         //PRUEBA
-/*
+
         int[] resultado = new int[2];
-        resultado[0] = 1;
+        resultado[0] = total;
         resultado[1] = acortadas;
         return resultado;
+
+        /*
 
         String[] resultado = new String[2];
         resultado[0] = "1";

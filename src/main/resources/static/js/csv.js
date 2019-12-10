@@ -25,17 +25,19 @@ $(document).ready(
                     //enctype: 'multipart/form-data',
                     success: function(total) {
                         //var total = 0;
-                        console.log(total);
+
+                        window.location='/download';
                         $("#result2").html(
-                            /*
+
                             "<h1>Numero URI's totales: </h1>"
-                            + total
+                            + total[0]
                             +"<h1>Numero URI's acortadas: </h1>"
-                            + total);*/
+                            + total[1]/*
                             "<a href="
                             +total
                             +">"
                             + "DESCARGAR FICHERO </a>"
+*/
 
                         );
                     },
