@@ -85,8 +85,7 @@ public class QRCodeService {
 
 	/**
 	 * Get circuit's state
-	 * 
-	 * @param short_url
+	 *
 	 * @return Current circuite'state
 	 */
 	public String getCircuitState() {

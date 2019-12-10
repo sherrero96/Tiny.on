@@ -71,6 +71,7 @@ public class URIAvailable {
                 return true;
             }
         }
+        // TODO: Ask Javier
         // Generate a error because uri is not available
         return false;
     }
@@ -95,6 +96,7 @@ public class URIAvailable {
             return httpConnection.getResponseCode();
         }catch(Exception e){
             // In case of error, we return -1
+            // TODO: Ask Javier
             return -1;
         }
     }
