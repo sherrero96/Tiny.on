@@ -86,7 +86,7 @@ public class URIAvailable {
      * @param uri The uri to check if it is reachable
      * @return 1 if is reachable, -1 if not.
      */
-    private static int getURIResponseGet(@NonNull String uri){
+    private int getURIResponseGet(@NonNull String uri){
         // OKhttpClient to get the petition, with a timeout
         OkHttpClient client = new OkHttpClient.Builder()
                 .readTimeout(TIME_GET, TimeUnit.MILLISECONDS)
