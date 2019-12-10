@@ -33,6 +33,7 @@ dependencies {
 
     implementation 'eu.bitwalker:UserAgentUtils:1.21'
     implementation 'org.json:json:20190722'
+    implementation 'com.squareup.okhttp3:okhttp:4.2.1'
 
     runtime 'org.webjars:bootstrap:3.3.5'
     runtime 'org.webjars:jquery:2.1.4'
