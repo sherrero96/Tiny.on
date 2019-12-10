@@ -17,6 +17,13 @@ repositories {
 dependencies {
 	compile 'org.apache.httpcomponents:httpclient'
 
+    compile 'io.github.resilience4j:resilience4j-circuitbreaker:1.2.0'
+    compile 'io.github.resilience4j:resilience4j-spring-boot2:1.2.0'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-aop'
+
+    implementation 'net.glxn:qrgen:1.4'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'

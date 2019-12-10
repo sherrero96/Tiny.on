@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
-import urlshortener.service.QRCode;
+import urlshortener.service.QRCodeService;
 import urlshortener.service.ShortURLService;
 import urlshortener.service.URIAvailable;
 
@@ -41,7 +41,7 @@ public class UrlShortenerController {
     private URIAvailable availableURI = new URIAvailable(); // To check if a URI is reachable
 
     @Autowired
-    private QRCode qrCode = new QRCode();
+    private QRCodeService qrCode = new QRCodeService();
 
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
@@ -65,14 +65,12 @@ public class UrlShortenerController {
         }
     }
 
-
-
     @RequestMapping(value = "/qr", method = RequestMethod.GET)
     public void qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
         ShortURL l = shortUrlService.findByKey(id);
         if (l != null && availableURI.isURIAvailable(l.getTarget())) {
             String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-            InputStream in = qrCode.getQRImageAsStream(baseUrl + '/' + id);
+            InputStream in = qrCode.getQRImage(baseUrl + '/' + id);
             response.setContentType(MediaType.IMAGE_PNG_VALUE);
             IOUtils.copy(in, response.getOutputStream());
         }
