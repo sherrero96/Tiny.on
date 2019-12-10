@@ -77,7 +77,9 @@ public class QRCodeTest {
 	}
 
 	/**
-	 *
+	 * Checks QR image generated decoded content it's equal to same content previously
+	 * coded
+	 * 
 	 * @throws IOException
 	 */
 	@Test
@@ -95,7 +97,8 @@ public class QRCodeTest {
 	}
 
 	/**
-	 * 
+	 * Checks QR image generated decoded content isn't equal to different content
+	 * previously coded
 	 *
 	 * @throws IOException
 	 */
@@ -114,20 +117,22 @@ public class QRCodeTest {
 	}
 
 	/**
-	 *
+	 * Simulates API shut down so circuit will have to be open 
+	 * 
+	 * @param image
 	 * @return
 	 */
 	@Test
 	public void forceOpenCircuit() {
 		QRCodeService qrBadAPI = new QRCodeService("https://www.badurlchoosenonporpuse.es");
 
-		assertEquals("CLOSED", qrBadAPI.getCircuitState().name());
+		assertEquals("CLOSED", qrBadAPI.getCircuitState());
 
-		// API is down so circuit must be opened after requests
+		// API is down so circuit must be open after requests
 		qrBadAPI.getQRImage("https://www.google.com");
 		qrBadAPI.getQRImage("https://www.google.com");
 
-		assertEquals("OPEN", qrBadAPI.getCircuitState().name());
+		assertEquals("OPEN", qrBadAPI.getCircuitState());
 	}
 
 	/** FUNCITONS USED IN TEST */

@@ -88,8 +88,8 @@ public class QRCodeService {
 	 *
 	 * @return Current circuite'state
 	 */
-	public CircuitBreaker.State getCircuitState() {
-		return circuitBreaker.getState();
+	public String getCircuitState() {
+		return circuitBreaker.getState().name();
 	}
 
 	/**
@@ -99,16 +99,24 @@ public class QRCodeService {
 	 * @return QR image as input stream
 	 */
 	public InputStream getQRImage(@NonNull String short_url) {
-		Supplier<InputStream> image = () -> getQRImageFromAPI(short_url);
+		InputStream finalImage;
 
-		image = CircuitBreaker.decorateSupplier(circuitBreaker, image);
+		if (getCircuitState().equals("OPEN")) {
+			finalImage = generateQRImage(short_url);
+		}
+		else {
+			Supplier<InputStream> image = () -> getQRImageFromAPI(short_url);
 
-		RetryConfig retryConfig = RetryConfig.custom().maxAttempts(MAX_REINTENTOS).build();
-		Retry retry = Retry.of("imageQR", retryConfig);
-		image = Retry.decorateSupplier(retry, image);
+			image = CircuitBreaker.decorateSupplier(circuitBreaker, image);
 
-		InputStream finalImage = Try.ofSupplier(image)
-								.recover(throwable -> generateQRImage(short_url)).get();
+			RetryConfig retryConfig = RetryConfig.custom().maxAttempts(MAX_REINTENTOS).build();
+			Retry retry = Retry.of("imageQR", retryConfig);
+			image = Retry.decorateSupplier(retry, image);
+
+			finalImage = Try.ofSupplier(image)
+									.recover(throwable -> generateQRImage(short_url)).get();
+		}
+
 
 		return finalImage;
 	}
