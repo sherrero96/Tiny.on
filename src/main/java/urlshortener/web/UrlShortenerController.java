@@ -65,8 +65,6 @@ public class UrlShortenerController {
         }
     }
 
-
-
     @RequestMapping(value = "/qr", method = RequestMethod.GET)
     public void qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
         ShortURL l = shortUrlService.findByKey(id);
