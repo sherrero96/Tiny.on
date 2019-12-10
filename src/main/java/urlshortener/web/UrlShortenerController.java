@@ -17,25 +17,35 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import urlshortener.domain.ShortURL;
 import urlshortener.service.ClickService;
 import urlshortener.service.QRCodeService;
 import urlshortener.service.ShortURLService;
 import urlshortener.service.URIAvailable;
+import urlshortener.service.CSVConverter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Scanner;
 
 @RestController
 public class UrlShortenerController {
     private final ShortURLService shortUrlService;
 
     private final ClickService clickService;
+    private final CSVConverter csv;
 
     @Autowired
     private URIAvailable availableURI = new URIAvailable(); // To check if a URI is reachable
@@ -43,9 +53,10 @@ public class UrlShortenerController {
     @Autowired
     private QRCodeService qrCode = new QRCodeService();
 
-    public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
+    public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, CSVConverter csv) {
         this.shortUrlService = shortUrlService;
         this.clickService = clickService;
+        this.csv = csv;
     }
 
     @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
@@ -142,5 +153,32 @@ public class UrlShortenerController {
         HttpHeaders h = new HttpHeaders();
         h.setLocation(URI.create(l.getTarget()));
         return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
+    }
+
+
+
+    @RequestMapping(value = "/csv", method = RequestMethod.POST)
+    public int[] handleFileUpload( @RequestParam("file") @NonNull MultipartFile file,
+                                   RedirectAttributes redirectAttributes) throws IOException {
+        System.out.println(file.getInputStream());
+        System.out.println("Empieza la función");
+        int total;
+        csv.CalcularTotal(new InputStreamReader
+                (new FileInputStream("src/main/resources/static/csv/Ejemplo.csv"), StandardCharsets.UTF_8));
+        total = csv.total();
+        HashMap<String, String> strings = csv.ConverterCSV(new InputStreamReader
+                (new FileInputStream("src/main/resources/static/csv/Ejemplo.csv"), StandardCharsets.UTF_8));
+        int acortadas = csv.acortadas();
+
+        System.out.println("URI's Totales en el fichero: " + total);
+        System.out.println("URI's acortadas correctamente: " + acortadas);
+
+        csv.guardar();
+
+        //PRUEBA
+        int[] resultado = new int[2];
+        resultado[0] = total;
+        resultado[1] = acortadas;
+        return resultado;
     }
 }
