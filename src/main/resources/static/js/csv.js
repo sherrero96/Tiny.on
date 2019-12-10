@@ -40,6 +40,7 @@ $(document).ready(
 */
 
                         );
+                        //window.location = '/delete';
                     },
                     error: function () {
                         $("#result2").html(

@@ -224,6 +224,16 @@ public class UrlShortenerController {
         }
 
 
+    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    public void deleteFile() throws IOException
+    {
+        String filename = "src/main/resources/static/csv/Salida.csv";
+        File file = new File(filename);
+        file.delete();
+
+    }
+
+
 
 
 
