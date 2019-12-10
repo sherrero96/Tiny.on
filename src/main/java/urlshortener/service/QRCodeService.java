@@ -102,7 +102,10 @@ public class QRCodeService {
 	public InputStream getQRImage(@NonNull String short_url) {
 		InputStream finalImage;
 
-		if (getCircuitState().equals("CLOSED")) {
+		if (getCircuitState().equals("OPEN")) {
+			finalImage = generateQRImage(short_url);
+		}
+		else {
 			Supplier<InputStream> image = () -> getQRImageFromAPI(short_url);
 
 			image = CircuitBreaker.decorateSupplier(circuitBreaker, image);
@@ -113,9 +116,6 @@ public class QRCodeService {
 
 			finalImage = Try.ofSupplier(image)
 									.recover(throwable -> generateQRImage(short_url)).get();
-		}
-		else {
-			finalImage = generateQRImage(short_url);
 		}
 
 
