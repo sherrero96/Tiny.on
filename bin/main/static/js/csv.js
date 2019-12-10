@@ -23,21 +23,14 @@ $(document).ready(
                     processData: false,
                     contentType: false,
                     //enctype: 'multipart/form-data',
-                    success: function(total) {
-                        //var total = 0;
+                    success: function() {
+                        var total = 0;
                         console.log(total);
                         $("#result2").html(
-                            /*
                             "<h1>Numero URI's totales: </h1>"
                             + total
                             +"<h1>Numero URI's acortadas: </h1>"
-                            + total);*/
-                            "<a href="
-                            +total
-                            +">"
-                            + "DESCARGAR FICHERO </a>"
-
-                        );
+                            + total);
                     },
                     error: function () {
                         $("#result2").html(

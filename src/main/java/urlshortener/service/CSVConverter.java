@@ -5,13 +5,20 @@ import org.springframework.stereotype.Service;
 
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import urlshortener.domain.ShortURL;
 
 import urlshortener.repository.ShortURLRepository;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 // El cliente trata el fichero y envia un string o una cadena de caracteres simplemente, el servidor trata esa cadena y envia otra.
@@ -173,5 +180,9 @@ public class CSVConverter {
         return file;
     }
 
+    @RequestMapping(value = "/{id:(?!link|index).*}/csvEstado", method = RequestMethod.GET)
+    public String obtainCsv(HttpServletRequest request, HttpServletResponse response) {
+        return "forward:/static/csvEstado.html";
+    }
 
 }
