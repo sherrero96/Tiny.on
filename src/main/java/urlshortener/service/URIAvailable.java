@@ -1,5 +1,8 @@
 package urlshortener.service;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -7,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -82,21 +86,20 @@ public class URIAvailable {
      * @param uri The uri to check if it is reachable
      * @return 1 if is reachable, -1 if not.
      */
-    private static int getURIResponseGet(@NonNull String uri){
-        try{
-            // First we create and open the http connection
-            HttpURLConnection httpConnection = (HttpURLConnection) new URL(uri).openConnection();
-            // We make a request only to get the header
-            httpConnection.setRequestMethod("HEAD");
-            // Connect Timeout
-            httpConnection.setConnectTimeout(TIME_GET);
-            // Read Timeout
-            httpConnection.setReadTimeout(TIME_GET);
-            // We return the code that has arrived from the request.
-            return httpConnection.getResponseCode();
-        }catch(Exception e){
-            // In case of error, we return -1
-            // TODO: Ask Javier
+    private int getURIResponseGet(@NonNull String uri){
+        // OKhttpClient to get the petition, with a timeout
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(TIME_GET, TimeUnit.MILLISECONDS)
+                .build();
+
+        // Create the request to the uri
+        Request request = new Request.Builder()
+                    .url(uri)
+                    .build();
+        try {
+            Response response = client.newCall(request).execute();
+            return response.code();
+        }catch (Exception e) {
             return -1;
         }
     }
