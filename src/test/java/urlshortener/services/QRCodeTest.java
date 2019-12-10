@@ -114,14 +114,12 @@ public class QRCodeTest {
 	}
 
 	/**
-	 * 
-	 * @param image
+	 *
 	 * @return
 	 */
 	@Test
 	public void forceOpenCircuit() {
 		QRCodeService qrBadAPI = new QRCodeService("https://www.badurlchoosenonporpuse.es");
-		
 
 		assertEquals("CLOSED", qrBadAPI.getCircuitState().name());
 
