@@ -155,7 +155,7 @@ public class CSVConverter {
         }
     }
 
-    public boolean guardar() throws IOException {
+    public File guardar() throws IOException {
         File file = new File("src/main/resources/static/csv/Salida.csv");
         boolean p = file.createNewFile();
         if(p){
@@ -170,7 +170,7 @@ public class CSVConverter {
             fw.close();
         }
 
-        return p;
+        return file;
     }
 
 

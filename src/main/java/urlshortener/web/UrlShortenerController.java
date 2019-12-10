@@ -1,6 +1,7 @@
 package urlshortener.web;
 
 import eu.bitwalker.useragentutils.UserAgent;
+import jdk.internal.loader.Resource;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -13,6 +14,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,10 +33,7 @@ import urlshortener.service.CSVConverter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -158,27 +157,72 @@ public class UrlShortenerController {
 
 
     @RequestMapping(value = "/csv", method = RequestMethod.POST)
-    public int[] handleFileUpload( @RequestParam("file") @NonNull MultipartFile file,
-                                   RedirectAttributes redirectAttributes) throws IOException {
+    public ResponseEntity<InputStreamResource> handleFileUpload(@RequestParam("file") MultipartFile file,
+                                                     RedirectAttributes redirectAttributes) throws IOException {
         System.out.println(file.getInputStream());
         System.out.println("Empieza la función");
         int total;
         csv.CalcularTotal(new InputStreamReader
-                (new FileInputStream("src/main/resources/static/csv/Ejemplo.csv"), StandardCharsets.UTF_8));
+                (file.getInputStream(), StandardCharsets.UTF_8));
         total = csv.total();
         HashMap<String, String> strings = csv.ConverterCSV(new InputStreamReader
-                (new FileInputStream("src/main/resources/static/csv/Ejemplo.csv"), StandardCharsets.UTF_8));
+                (file.getInputStream(), StandardCharsets.UTF_8));
         int acortadas = csv.acortadas();
 
         System.out.println("URI's Totales en el fichero: " + total);
         System.out.println("URI's acortadas correctamente: " + acortadas);
 
-        csv.guardar();
+        File file2 = csv.guardar();
+
+        InputStreamResource resource = new InputStreamResource( new FileInputStream(file2));
+
+        return ResponseEntity.ok()
+                .contentLength(file2.length())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+
+
+
+
+
 
         //PRUEBA
+/*
         int[] resultado = new int[2];
-        resultado[0] = total;
+        resultado[0] = 1;
         resultado[1] = acortadas;
         return resultado;
+
+        String[] resultado = new String[2];
+        resultado[0] = "1";
+        resultado[1] = Integer.toString(acortadas);
+        return resultado;*/
     }
+
+
+        @RequestMapping(value = "/download", method = RequestMethod.GET)
+        public ResponseEntity<Object> downloadFile() throws IOException
+        {
+            String filename = "src/main/resources/static/csv/Salida.csv";
+            File file = new File(filename);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition",
+                    String.format("attachment; filename=\"%s\"", file.getName()));
+            headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+            headers.add("Pragma", "no-cache");
+            headers.add("Expires", "0");
+
+            ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
+                    .contentLength(file.length())
+                    .contentType(MediaType.parseMediaType("application/txt")).body(resource);
+
+            return responseEntity;
+        }
+
+
+
+
+
 }
