@@ -38,10 +38,22 @@ public class ClickService {
         List<Click> hashes = clickRepository.findByHash(hash);
         ArrayList<String> result = new ArrayList<>();
         result.add(0, String.valueOf(hashes.size()));
-        Click lastClick = hashes.get(hashes.size() - 1);
-        result.add(1, lastClick.getIp());
-        result.add(2, lastClick.getCountry());
-        result.add(3, lastClick.getPlatform());
+        if(hashes.size() == 0){
+            // Ninguna visita realizada... ponemos datos fijados
+            result.add(1, "Desconocido");
+            result.add(2, "Desconocido");
+            result.add(3, "Desconocido");
+        }else{
+            Click lastClick = hashes.get(hashes.size() - 1);
+            if(lastClick.getIp().equals("0:0:0:0:0:0:0:1")){
+                result.add(1, "0.0.0.0");
+            }else{
+                result.add(1, lastClick.getIp());
+            }
+            result.add(2, lastClick.getCountry());
+            result.add(3, lastClick.getPlatform());
+        }
+
         return result;
     }
 
