@@ -154,7 +154,7 @@ public class QRCodeService {
 	 * @param short_url Text to be converted into image
 	 * @return QR image as input stream
 	 */
-	@CachePut(value="qr", key="#shorturl")
+	@CachePut(value="qr", key="#short_url")
 	public byte[] generateQRImage(@NonNull String short_url) {
 		ByteArrayOutputStream os = QRCode.from(short_url).to(ImageType.PNG).withSize(100, 100).stream();
 		return os.toByteArray();
