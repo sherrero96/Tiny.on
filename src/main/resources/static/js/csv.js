@@ -18,26 +18,26 @@ $(document).ready(
                 $.ajax({
                     type: "POST",
                     url: "/csv",
-                    data: new FormData(document.getElementById("uploaderCSV")),
+                    data: new FormData(document.getElementById("uploaderCSV"), $(this).serialize()),
                     dataType: "html",
                     processData: false,
                     contentType: false,
                     //enctype: 'multipart/form-data',
                     success: function(total) {
                         //var total = 0;
-
-                        window.location='/download';
+                        var data = total.split(",");
+                        //window.location='/download';
                         $("#result2").html(
 
                             "<h1>Numero URI's totales: </h1>"
-                            + total[0]
+                            + data[0]
                             +"<h1>Numero URI's acortadas: </h1>"
-                            + total[1]/*
-                            "<a href="
-                            +total
+                            + data[1]
+                            +
+                            "<br><a href="
+                            +data[2]
                             +">"
                             + "DESCARGAR FICHERO </a>"
-*/
 
                         );
                         //window.location = '/delete';

@@ -58,7 +58,7 @@ public class UrlShortenerController {
         this.csv = csv;
     }
 
-    @RequestMapping(value = "/{id:(?!link|index).*}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id:(?!link|index|stats).*}", method = RequestMethod.GET)
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
         if(l != null){
@@ -157,9 +157,13 @@ public class UrlShortenerController {
 
 //ResponseEntity<InputStreamResource>
     @RequestMapping(value = "/csv", method = RequestMethod.POST)
-    public int[] handleFileUpload(@RequestParam("file") MultipartFile file,
+    public String handleFileUpload(@RequestParam("file") MultipartFile file, String name,
                                                      RedirectAttributes redirectAttributes) throws IOException {
-        System.out.println(file.getInputStream());
+
+        String nombreFichero = file.getOriginalFilename();
+
+
+
         System.out.println("Empieza la función");
         int total;
         csv.CalcularTotal(new InputStreamReader
@@ -172,40 +176,24 @@ public class UrlShortenerController {
         System.out.println("URI's Totales en el fichero: " + total);
         System.out.println("URI's acortadas correctamente: " + acortadas);
 
-        File file2 = csv.guardar();
+        File file2 = csv.guardar(nombreFichero);
 
         InputStreamResource resource = new InputStreamResource( new FileInputStream(file2));
 
-        /*return ResponseEntity.ok()
-                .contentLength(file2.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(resource);
 
-*/
-        //return "http://localhost:8080/download";
-
-
-
-        //PRUEBA
-
-        int[] resultado = new int[2];
-        resultado[0] = total;
-        resultado[1] = acortadas;
+        String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
+        String resultado = total + "," + acortadas + "," + respuestaDescarga;
         return resultado;
 
-        /*
 
-        String[] resultado = new String[2];
-        resultado[0] = "1";
-        resultado[1] = Integer.toString(acortadas);
-        return resultado;*/
     }
 
-
-        @RequestMapping(value = "/download", method = RequestMethod.GET)
-        public ResponseEntity<Object> downloadFile() throws IOException
+//response.setheader (content-disposition) "attachment; filename"
+        @RequestMapping(value = "/download/{fileName}", method = RequestMethod.GET)
+        public ResponseEntity<Object> downloadFile(@PathVariable("fileName") String name) throws IOException
         {
-            String filename = "src/main/resources/static/csv/Salida.csv";
+            System.out.println("NOMBRE DESCARGAAAAA: " + name);
+            String filename = "src/main/resources/static/csv/Salida_" + name + ".csv";
             File file = new File(filename);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
@@ -224,13 +212,14 @@ public class UrlShortenerController {
         }
 
 
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
-    public void deleteFile() throws IOException
+    @RequestMapping(value = "/delete/{fileName}", method = RequestMethod.GET)
+    public void deleteFile(@PathVariable("fileName") String name) throws IOException
     {
-        String filename = "src/main/resources/static/csv/Salida.csv";
+        String filename = "src/main/resources/static/csv/Salida" + name + ".csv";
         File file = new File(filename);
         file.delete();
 
+        //Politica de empresa: Que borre semanalmente todos los ficheros generados que haya en el archivo?
     }
 
 

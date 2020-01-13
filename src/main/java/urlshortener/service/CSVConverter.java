@@ -162,8 +162,11 @@ public class CSVConverter {
         }
     }
 
-    public File guardar() throws IOException {
-        File file = new File("src/main/resources/static/csv/Salida.csv");
+    public File guardar(String name) throws IOException {
+        System.out.println(name);
+        String nombreFichero = "src/main/resources/static/csv/Salida_" + name + ".csv";
+        //File file = new File("src/main/resources/static/csv/Salida.csv");
+        File file = new File(nombreFichero);
         boolean p = file.createNewFile();
         if(p){
 
