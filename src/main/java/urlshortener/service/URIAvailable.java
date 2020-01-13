@@ -3,37 +3,63 @@ package urlshortener.service;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import urlshortener.repository.ShortURLRepository;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class to check if a URI is reachable.
  */
 @Service
+@EnableScheduling
 public class URIAvailable {
 
     // List of error codes admited by the checker
     private static final int[] errorCodesOK= {200, 201, 204};
 
     // Time between check and check
-    private static final int TIME_URI_CHECK = 5000;
+    private static final int TIME_URI_CHECK = 3000;
 
     // Timeout get petition
     private static final int TIME_GET = 1000;
 
-    private ConcurrentHashMap<String, AtomicBoolean> map = new ConcurrentHashMap<>();
+    // Number of failed requests allowed before delete
+    private static final int ALLOWED_FAILS = 1;
+
+    @Autowired
+    private ShortURLRepository shortURLRepository;
+
+    private ConcurrentHashMap<String, AtomicInteger> map = new ConcurrentHashMap<>();
 
     /**
-     * Update the booleans of the hashmap
+     * Update the URI fault structure
+     * If the number of faults exceeds the permitted number, it will be removed from the
      */
     @Scheduled(fixedRate = TIME_URI_CHECK)
     public void checkUris(){
-        map.forEach((uri, state) -> state.set(checkUriAvailable(uri)));
+        // Iterate over all the structure
+        for(Map.Entry<String, AtomicInteger> entry : map.entrySet()){
+            // If the Uri is not reachable
+            if(!checkUriAvailable(entry.getKey())){
+                // If the Uri is not available, increment one unit the fails
+                entry.getValue().incrementAndGet();
+                // If the number of errors is the allowed one, it is removed from the database
+                if(entry.getValue().get() > ALLOWED_FAILS){
+                    map.remove(entry.getKey());
+                }
+            // The URI is reachable
+            }else{
+                entry.setValue(new AtomicInteger(0));
+            }
+        }
     }
 
     /**
@@ -41,8 +67,8 @@ public class URIAvailable {
      * @param uri
      */
     public void saveURI(String uri){
-        if(!map.containsKey(uri)){
-            map.put(uri, new AtomicBoolean(checkUriAvailable(uri)));
+        if(!map.containsKey(uri) && checkUriAvailable(uri)){
+            map.put(uri, new AtomicInteger(0));
         }
     }
 
@@ -54,7 +80,7 @@ public class URIAvailable {
     public boolean isURIAvailable(String uri){
         boolean isAvailable = false;
         if(map.containsKey(uri)){
-            isAvailable =  map.get(uri).get();
+            isAvailable =  (map.get(uri).get() == 0);
         }else{
             isAvailable = checkUriAvailable(uri);
         }
@@ -73,8 +99,7 @@ public class URIAvailable {
                 return true;
             }
         }
-        // TODO: Ask Javier
-        // Generate a error because uri is not available
+
         return false;
     }
 
@@ -101,4 +126,5 @@ public class URIAvailable {
             return -1;
         }
     }
+
 }

@@ -2,6 +2,10 @@ package urlshortener.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import urlshortener.domain.Click;
 import urlshortener.repository.ClickRepository;
@@ -10,7 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@EnableScheduling
 public class ClickService {
+
+    public final int TIME_UPDATE_CACHE = 5000;     // Cada 5 segundos se borra la cache. Se puede cambiar
+                                                            // según lógica de negocio
 
     private static final Logger log = LoggerFactory
             .getLogger(ClickService.class);
@@ -34,15 +42,34 @@ public class ClickService {
      * @param hash The url shortened for the stats
      * @return ArrayList[0]: number of times, ArrayList[1]:Address last visit, ArrayList[2]:location, ArrayList[3]:platform
      */
+    @Cacheable(value = "lastStats")
     public ArrayList<String> obtainLastStats(String hash){
         List<Click> hashes = clickRepository.findByHash(hash);
         ArrayList<String> result = new ArrayList<>();
         result.add(0, String.valueOf(hashes.size()));
-        Click lastClick = hashes.get(hashes.size() - 1);
-        result.add(1, lastClick.getIp());
-        result.add(2, lastClick.getCountry());
-        result.add(3, lastClick.getPlatform());
+        if(hashes.size() == 0){
+            // Ninguna visita realizada... ponemos datos fijados
+            result.add(1, "Desconocido");
+            result.add(2, "Desconocido");
+            result.add(3, "Desconocido");
+        }else{
+            Click lastClick = hashes.get(hashes.size() - 1);
+            if(lastClick.getIp().equals("0:0:0:0:0:0:0:1")){
+                result.add(1, "0.0.0.0");
+            }else{
+                result.add(1, lastClick.getIp());
+            }
+            result.add(2, lastClick.getCountry());
+            result.add(3, lastClick.getPlatform());
+        }
+
         return result;
+    }
+
+    @Scheduled(fixedRate = TIME_UPDATE_CACHE)
+    @CacheEvict(allEntries = true, value = "lastStats")
+    public void updateCache(){
+        log.info("Delete the cache of stats..");
     }
 
 }

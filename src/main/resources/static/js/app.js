@@ -14,6 +14,11 @@ $(document).ready(
                             + "'>"
                             + msg.uri
                             + "</a></div>"
+                            + "<div class='alert alert-info lead'><a target='_blank' href='"
+                            + msg.uri + "/stats"
+                            + "'>"
+                            + msg.uri + "/stats"
+                            + "</a></div>"
                             + "<img src="
                             + getQRUri(msg.uri)
                             + " class=img-fluid >");
