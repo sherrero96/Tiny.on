@@ -1,12 +1,17 @@
 package urlshortener.services;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
+
+import org.junit.Test;
+import org.apache.commons.io.FileUtils;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
@@ -18,13 +23,8 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-
 import urlshortener.service.QRCodeService;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -32,7 +32,7 @@ public class QRCodeTest {
 
 	private QRCodeService qr = new QRCodeService();
 
-	private final String googleQRImagePath = "src/test/resources/qr_test/google_url.png";
+	private final String GOOGLE_QR_IMAGE_PATH = "src/test/resources/qr_test/google_url.png";
 
 	/**
 	 * Checks QR image obtained from an url using our QRCode class it's equal to the
@@ -43,12 +43,10 @@ public class QRCodeTest {
 	@Test
 	public void correctQRCodeFromAPI() {
 		try {
-			InputStream query_image = qr.getQRImageFromAPI("https://www.google.com");
-			InputStream stored_image = new FileInputStream(new File(googleQRImagePath));
+			byte[] query_image = qr.getQRImageFromAPI("https://www.google.com");
+			byte[] stored_image = Files.readAllBytes(Paths.get(GOOGLE_QR_IMAGE_PATH));
 
-			assertTrue(IOUtils.contentEquals(query_image, stored_image));
-
-			stored_image.close();
+			assertTrue(Arrays.equals(query_image, stored_image));
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -64,12 +62,10 @@ public class QRCodeTest {
 	@Test
 	public void incorrectQRCodeFromAPI() {
 		try {
-			InputStream query_image = qr.getQRImageFromAPI("https://www.habbo.es");
-			InputStream stored_image = new FileInputStream(new File(googleQRImagePath));
+			byte[] query_image = qr.getQRImageFromAPI("https://www.habbo.es");
+			byte[] stored_image = FileUtils.readFileToByteArray(new File(GOOGLE_QR_IMAGE_PATH));
 
-			assertFalse(IOUtils.contentEquals(query_image, stored_image));
-
-			stored_image.close();
+			assertNotEquals(query_image, stored_image);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -84,16 +80,9 @@ public class QRCodeTest {
 	 */
 	@Test
 	public void correctQRCodeGenerated() {
-		try {
-			InputStream query_image = qr.generateQRImage("https://www.google.com");
+		byte[] query_image = qr.generateQRImage("https://www.google.com");
 
-			assertEquals("https://www.google.com", decode(query_image));
-
-			query_image.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		assertEquals("https://www.google.com", decode(query_image));
 	}
 
 	/**
@@ -104,16 +93,9 @@ public class QRCodeTest {
 	 */
 	@Test
 	public void incorrectQRGenerated() {
-		try {
-			InputStream query_image = qr.generateQRImage("https://www.habbo.es");
+		byte[] query_image = qr.generateQRImage("https://www.habbo.es");
 
-			assertNotEquals("https://www.google.com", decode(query_image));
-
-			query_image.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		assertNotEquals("https://www.google.com", decode(query_image));
 	}
 
 	/**
@@ -135,10 +117,26 @@ public class QRCodeTest {
 		assertEquals("OPEN", qrBadAPI.getCircuitState());
 	}
 
-	/** FUNCITONS USED IN TEST */
-	private String decode(InputStream image) {
+	@Test
+	public void cache() {
+		QRCodeService qrCode = new QRCodeService();
+		
+		long start_fail = System.currentTimeMillis();
+		qrCode.getQRImage("https://www.google.com");
+		long end_fail = System.currentTimeMillis();
+
+		long start_hit = System.currentTimeMillis();
+		qrCode.getQRImage("https://www.google.com");
+		long end_hit = System.currentTimeMillis();
+
+		// Could be more robust
+		assertTrue((end_hit - start_hit) < (end_fail - start_fail));
+	}
+
+	/** Private functions used in tests */
+	private String decode(byte[] image) {
 		try {
-			BufferedImage bufferedImage = ImageIO.read(image);
+			BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
 			LuminanceSource source = new BufferedImageLuminanceSource(bufferedImage);
 			BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 			QRCodeReader qrReader = new QRCodeReader();
