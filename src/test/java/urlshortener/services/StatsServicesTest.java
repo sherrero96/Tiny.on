@@ -120,6 +120,33 @@ public class StatsServicesTest {
         assert  response.code() == 200;
         assert Objects.equals(response.request().url().queryParameter("number"), "3");
 
+    }
+
+    @Test
+    public void statsNotEmptyReturnDataWithCacheIsFaster() throws InterruptedException, IOException {
+        Thread.sleep(clickService.TIME_UPDATE_CACHE);   // Now the cache is clean
+
+        // Register a new click from localhost
+        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .build();
+        // Create the request to the uri
+        Request request = new Request.Builder()
+                .url("http://localhost:" + port + "/f656/stats")
+                .build();
+
+        // We call a petition
+        long timeBefore = System.currentTimeMillis();
+        Response response = client.newCall(request).execute();
+        long timeWithoutCache = System.currentTimeMillis() - timeBefore;
+
+        // We call a new petition
+        timeBefore = System.currentTimeMillis();
+        response = client.newCall(request).execute();
+        long timeWithCache = System.currentTimeMillis() - timeBefore;
+
+        assert timeWithoutCache > timeWithCache;
 
     }
 
