@@ -37,7 +37,6 @@ public class StatsService {
         clicks.put("location", lastClick.get(2));
         clicks.put("platform", lastClick.get(3));
 
-        ModelAndView modelAndView = new ModelAndView("redirect:/stats.html", clicks);
-        return modelAndView;
+        return new ModelAndView("redirect:/stats.html", clicks);
     }
 }
