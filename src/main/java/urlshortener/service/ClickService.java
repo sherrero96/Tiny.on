@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import urlshortener.domain.Click;
 import urlshortener.repository.ClickRepository;
@@ -14,11 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@EnableScheduling
 public class ClickService {
-
-    public final int TIME_UPDATE_CACHE = 5000;     // Cada 5 segundos se borra la cache. Se puede cambiar
-                                                            // según lógica de negocio
 
     private static final Logger log = LoggerFactory
             .getLogger(ClickService.class);
@@ -29,6 +23,7 @@ public class ClickService {
         this.clickRepository = clickRepository;
     }
 
+    @CacheEvict(key = "#hash", value = "lastStats", allEntries = true)
     public void saveClick(String hash, String ip, String country, String platform) {
         Click cl = ClickBuilder.newInstance().hash(hash).createdNow().ip(ip).country(country).platform(platform).build();
         cl = clickRepository.save(cl);
@@ -42,7 +37,7 @@ public class ClickService {
      * @param hash The url shortened for the stats
      * @return ArrayList[0]: number of times, ArrayList[1]:Address last visit, ArrayList[2]:location, ArrayList[3]:platform
      */
-    @Cacheable(value = "lastStats")
+    @Cacheable(value = "lastStats", key = "#hash")
     public ArrayList<String> obtainLastStats(String hash){
         List<Click> hashes = clickRepository.findByHash(hash);
         ArrayList<String> result = new ArrayList<>();
@@ -64,12 +59,6 @@ public class ClickService {
         }
 
         return result;
-    }
-
-    @Scheduled(fixedRate = TIME_UPDATE_CACHE)
-    @CacheEvict(allEntries = true, value = "lastStats")
-    public void updateCache(){
-        log.info("Delete the cache of stats..");
     }
 
 }

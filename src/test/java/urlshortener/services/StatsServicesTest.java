@@ -72,7 +72,6 @@ public class StatsServicesTest {
 
     @Test
     public void statsNotEmptyReturnData() throws IOException, InterruptedException {
-        Thread.sleep(clickService.TIME_UPDATE_CACHE);   // Now the cache is clean
 
         // Register a new click from localhost
         clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
@@ -90,42 +89,9 @@ public class StatsServicesTest {
         assert Objects.equals(response.request().url().queryParameter("number"), "1");
     }
 
-    @Test
-    public void statsNotEmptyReturnDataWithCache() throws IOException, InterruptedException {
-        Thread.sleep(clickService.TIME_UPDATE_CACHE);   // Now the cache is clean
-
-        // Register a new click from localhost
-        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .build();
-        // Create the request to the uri
-        Request request = new Request.Builder()
-                .url("http://localhost:" + port + "/f656/stats")
-                .build();
-        // We call a petition
-        Response response = client.newCall(request).execute();
-        // Now register a new click from localhost immediately
-        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
-        response = client.newCall(request).execute();
-
-        // Because the cache expire in TIME_UPDATE_CACHE seconds, the result is not update..
-        assert  response.code() == 200;
-        assert Objects.equals(response.request().url().queryParameter("number"), "2");
-
-        Thread.sleep(clickService.TIME_UPDATE_CACHE);
-
-        // Now before a time, call a new response
-        response = client.newCall(request).execute();
-        assert  response.code() == 200;
-        assert Objects.equals(response.request().url().queryParameter("number"), "3");
-
-    }
 
     @Test
     public void statsNotEmptyReturnDataWithCacheIsFaster() throws InterruptedException, IOException {
-        Thread.sleep(clickService.TIME_UPDATE_CACHE);   // Now the cache is clean
-
         // Register a new click from localhost
         clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
 
