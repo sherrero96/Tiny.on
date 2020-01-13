@@ -1,9 +1,7 @@
 package urlshortener.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import java.time.Duration;
 
@@ -16,6 +14,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,6 +29,8 @@ import io.github.resilience4j.retry.RetryConfig;
 import io.vavr.control.Try;
 
 import java.util.function.Supplier;
+
+import com.google.common.io.ByteStreams;
 
 @Service
 public class QRCodeService {
@@ -49,7 +51,7 @@ public class QRCodeService {
 	private static final int TIEMPO_LLAMADA_LENTA = 1;
 	
 	// Mínimo número de llamadas para transición open -> half-open
-	private static final int MIN_LLAMADAS_ANTES_CLOSE = 20;
+	private static final int MIN_LLAMADAS_ANTES_CLOSE = 5;
 	
 	// Número de llamadas para evaluar el estado del sistema
 	private static final int NUM_LLAMADAS_EVALUAR_ESTADO = 2;
@@ -98,25 +100,20 @@ public class QRCodeService {
 	 * @param short_url
 	 * @return QR image as input stream
 	 */
-	public InputStream getQRImage(@NonNull String short_url) {
-		InputStream finalImage;
+	@Cacheable(value="qr", key="#short_url")
+	public byte[] getQRImage(@NonNull String short_url) {
+		byte[] finalImage;
 
-		if (getCircuitState().equals("OPEN")) {
-			finalImage = generateQRImage(short_url);
-		}
-		else {
-			Supplier<InputStream> image = () -> getQRImageFromAPI(short_url);
+		Supplier<byte[]> image = () -> getQRImageFromAPI(short_url);
 
-			image = CircuitBreaker.decorateSupplier(circuitBreaker, image);
+		image = CircuitBreaker.decorateSupplier(circuitBreaker, image);
 
-			RetryConfig retryConfig = RetryConfig.custom().maxAttempts(MAX_REINTENTOS).build();
-			Retry retry = Retry.of("imageQR", retryConfig);
-			image = Retry.decorateSupplier(retry, image);
+		RetryConfig retryConfig = RetryConfig.custom().maxAttempts(MAX_REINTENTOS).build();
+		Retry retry = Retry.of("imageQR", retryConfig);
+		image = Retry.decorateSupplier(retry, image);
 
-			finalImage = Try.ofSupplier(image)
-									.recover(throwable -> generateQRImage(short_url)).get();
-		}
-
+		finalImage = Try.ofSupplier(image)
+								.recover(throwable -> generateQRImage(short_url)).get();
 
 		return finalImage;
 	}
@@ -128,7 +125,8 @@ public class QRCodeService {
 	 * @return QR image as input stream
 	 * @throws Exception
 	 */
-	public InputStream getQRImageFromAPI(@NonNull String short_url) {
+	@CachePut(value="qr", key="#short_url")
+	public byte[] getQRImageFromAPI(@NonNull String short_url) {
 		try {
 			String uri = UriComponentsBuilder.fromHttpUrl(URL_QR_API).queryParam("data", short_url)
 					.queryParam("size", "100x100").queryParam("format", "png").toUriString();
@@ -144,7 +142,7 @@ public class QRCodeService {
 				throw new RuntimeException();
 			}
 
-			return responseEntity.getContent();
+			return ByteStreams.toByteArray(responseEntity.getContent());
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
@@ -156,8 +154,9 @@ public class QRCodeService {
 	 * @param short_url Text to be converted into image
 	 * @return QR image as input stream
 	 */
-	public InputStream generateQRImage(@NonNull String short_url) {
+	@CachePut(value="qr", key="#shorturl")
+	public byte[] generateQRImage(@NonNull String short_url) {
 		ByteArrayOutputStream os = QRCode.from(short_url).to(ImageType.PNG).withSize(100, 100).stream();
-		return new ByteArrayInputStream(os.toByteArray());
+		return os.toByteArray();
 	}
 }

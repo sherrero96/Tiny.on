@@ -9,7 +9,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,8 @@ import urlshortener.service.URIAvailable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 @RestController
@@ -66,14 +65,19 @@ public class UrlShortenerController {
     }
 
     @RequestMapping(value = "/qr", method = RequestMethod.GET)
-    public void qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
+    public ResponseEntity<byte[]> qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
         ShortURL l = shortUrlService.findByKey(id);
         if (l != null && availableURI.isURIAvailable(l.getTarget())) {
-            String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-            InputStream in = qrCode.getQRImage(baseUrl + '/' + id);
-            response.setContentType(MediaType.IMAGE_PNG_VALUE);
-            IOUtils.copy(in, response.getOutputStream());
-        }
+			String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+			byte[] in = qrCode.getQRImage(baseUrl + '/' + id);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.IMAGE_PNG);
+			
+			return new ResponseEntity<>(in, headers, HttpStatus.CREATED);
+		}
+		else {
+			return ResponseEntity.badRequest().build();
+		}
     }
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)
