@@ -1,6 +1,8 @@
 package urlshortener.service;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,15 +37,7 @@ public class StatsService {
         clicks.put("location", lastClick.get(2));
         clicks.put("platform", lastClick.get(3));
 
-        // return redirection to stats.html
-        // Now we write in the output standard
-        /*String result = "";
-        result = result + "Nº of visits: \t" + lastClick.get(0) + "\n";
-        result = result + "IP address last visit: \t" + lastClick.get(1) + "\n";
-        result = result + "Location last visit: \t" + lastClick.get(2) + "\n";
-        result = result + "Platform last visit: \t" + lastClick.get(3) + "\n";*/
-        //return result;
-
-        return new ModelAndView("forward:/stats.html", clicks);
+        ModelAndView modelAndView = new ModelAndView("redirect:/stats.html", clicks);
+        return modelAndView;
     }
 }
