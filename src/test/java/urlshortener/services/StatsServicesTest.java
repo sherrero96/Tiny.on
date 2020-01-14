@@ -55,6 +55,27 @@ public class StatsServicesTest {
                 null));
     }
 
+    /**
+     * This test checks whether access to the statistics of an unreachable uri returns an error404
+     * @throws IOException
+     */
+    @Test
+    public void linkNotAvailableReturnError() throws IOException {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .build();
+        // Create the request to the uri
+        Request request = new Request.Builder()
+                .url("http://localhost:" + port + "/asd6/stats")
+                .build();
+        Response response = client.newCall(request).execute();
+
+        assert response.request().url().pathSegments().get(0).equals("error404.html");
+    }
+
+    /**
+     * This test verifies that the stats request of a uri that has never been visited returns 0 visits
+     * @throws IOException
+     */
     @Test
     public void statsEmptyReturnEmptyData() throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
@@ -70,8 +91,13 @@ public class StatsServicesTest {
         assert Objects.equals(response.request().url().queryParameter("number"), "0");
     }
 
+    /**
+     * This test verifies that the request for statistics of a uri that has been visited correctly
+     * returns the statistics
+     * @throws IOException
+     */
     @Test
-    public void statsNotEmptyReturnData() throws IOException, InterruptedException {
+    public void statsNotEmptyReturnData() throws IOException {
 
         // Register a new click from localhost
         clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
@@ -89,9 +115,13 @@ public class StatsServicesTest {
         assert Objects.equals(response.request().url().queryParameter("number"), "1");
     }
 
-
+    /**
+     * This test checks that the statistics request of a uri
+     * that has the cache stored is faster than if the cache is removed
+     * @throws IOException
+     */
     @Test
-    public void statsNotEmptyReturnDataWithCacheIsFaster() throws InterruptedException, IOException {
+    public void statsNotEmptyReturnDataWithCacheIsFaster() throws IOException {
         // Register a new click from localhost
         clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
 

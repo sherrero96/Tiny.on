@@ -47,7 +47,7 @@ public class UrlShortenerController {
         this.clickService = clickService;
     }
 
-    @RequestMapping(value = "/{id:(?!link|index|stats).*}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id:(?!link|index|stats|error404.html).*}", method = RequestMethod.GET)
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
         if(l != null){
