@@ -19,10 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import urlshortener.domain.ShortURL;
-import urlshortener.service.ClickService;
-import urlshortener.service.QRCodeService;
-import urlshortener.service.ShortURLService;
-import urlshortener.service.URIAvailable;
+import urlshortener.service.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
