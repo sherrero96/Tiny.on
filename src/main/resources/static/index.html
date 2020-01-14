@@ -9,6 +9,7 @@
     <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"
             type="text/javascript"></script>
     <script src="js/app.js" type="text/javascript"></script>
+    <script src="js/csv.js" type="text/javascript"></script>
 </head>
 <body>
 <div class="container-full">
@@ -37,10 +38,31 @@
                             class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
                 </div>
             </form>
+            <br>
+            <br>
+            <br>
+            <form action="" class="col-lg-12" id="uploaderCSV" name="uploaderCSV" role="form" enctype="multipart/form-data">
+                <div class="input-group input-group-lg col-lg-10 col-lg-offset-1">
+                    <input class="center-block form-control input-lg"
+                           placeholder="Subir CSV" title="Subir CSV" name="file" id="file" type="file" accept=".csv" >
+                    <span class="input-group-btn"><button
+                            class="btn btn-lg btn-primary" type="submit" onclick="move()">Short CSV file! </button></span>
+                </div>
+            </form>
+
             <div class="col-lg-12 text-center">
                 <div class="col-sm-offset-2 col-sm-8 text-center">
                     <br/>
                     <div id="result"/>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="col-sm-offset-2 col-sm-8 text-center">
+                        <br/>
+                        <div id="result2"/>
+                    </div>
                 </div>
             </div>
         </div>
