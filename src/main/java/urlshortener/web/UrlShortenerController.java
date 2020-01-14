@@ -178,17 +178,19 @@ public class UrlShortenerController {
         File fff = new File(uriFichero2222);
         while(fff.exists()){
             nombreFichero = String.valueOf(nombreFichero.hashCode()) + ".csv";
-            System.out.println("HASH CODE : " + nombreFichero);
             uriFichero2222 = "src/main/resources/static/csv/Salida_" + nombreFichero;
             fff = new File(uriFichero2222);
         }
 
         int total;
-
+        // SI total = 0 enviar algo para que sepa que es fichero vacío.
         csv.CalcularTotal(new InputStreamReader
                 (file.getInputStream(), StandardCharsets.UTF_8));
         total = csv.total();
-        if(total > 10) {
+        if(total == 0){
+            nombreFichero = "vacio";
+        }
+        if(total > 1) {
             InputCsv = new InputStreamReader(file.getInputStream());
             String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
             String resultadoEscalable = "escalable," + total + "," + respuestaDescarga + "," + nombreFichero;
