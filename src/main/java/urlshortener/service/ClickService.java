@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import urlshortener.domain.Click;
 import urlshortener.repository.ClickRepository;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class ClickService {
     }
 
     @CacheEvict(key = "#hash", value = "lastStats", allEntries = true)
-    public void saveClick(String hash, String ip, String country, String platform) {
-        Click cl = ClickBuilder.newInstance().hash(hash).createdNow().ip(ip).country(country).platform(platform).build();
+    public void saveClick(String hash, String ip, String country, String platform, Date date) {
+        Click cl = ClickBuilder.newInstance().hash(hash).createdNow().ip(ip).country(country).platform(platform).created(date).build();
         cl = clickRepository.save(cl);
         log.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" : "[" + hash + "] was not saved");
     }
@@ -49,11 +50,7 @@ public class ClickService {
             result.add(3, "Desconocido");
         }else{
             Click lastClick = hashes.get(hashes.size() - 1);
-            if(lastClick.getIp().equals("0:0:0:0:0:0:0:1")){
-                result.add(1, "0.0.0.0");
-            }else{
-                result.add(1, lastClick.getIp());
-            }
+            result.add(1, lastClick.getCreated().toString());
             result.add(2, lastClick.getCountry());
             result.add(3, lastClick.getPlatform());
         }

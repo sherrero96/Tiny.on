@@ -64,6 +64,11 @@ public class ClickBuilder {
         return this;
     }
 
+    ClickBuilder created(Date date){
+        this.created = date;
+        return this;
+    }
+
     ClickBuilder withoutCountry() {
         this.country = null;
         return this;
