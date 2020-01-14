@@ -7,7 +7,7 @@ import java.security.Key;
 public class Crypt {
 
     // Any key of 16 characters
-    private static String key = "IngenieriaWeb202";
+    private static String key = "IngenieriaWeb150";
 
     /**
      * Encrypt the text with the AES protocol and key
