@@ -20,7 +20,7 @@ import urlshortener.web.UrlShortenerController;
 import static org.junit.Assert.*;
 
 public class CsvTest {
-
+/*
     @Autowired
     private ShortURLRepository shortURLRepository;
 
@@ -130,5 +130,5 @@ public class CsvTest {
         }
     }
 
-
+*/
 }

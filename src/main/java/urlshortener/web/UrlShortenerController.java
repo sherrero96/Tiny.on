@@ -45,7 +45,7 @@ public class UrlShortenerController {
 
     private final ClickService clickService;
     private final CSVConverter csv;
-    private InputStreamReader ejemplo;
+    private InputStreamReader InputCsv;
 
     @Autowired
     private URIAvailable availableURI = new URIAvailable(); // To check if a URI is reachable
@@ -157,9 +157,17 @@ public class UrlShortenerController {
 
 
 //ResponseEntity<InputStreamResource>
+
+    /**
+     * Returns a string with the different results separated by a comma.
+     * @param file
+     * @return String
+     *          case Escalable: "escalable,total uri's, link download Resultfile, name ResultFile"
+     *          case noEscalable: "total uri's, link download ResultFile"
+     * @throws IOException
+     */
     @RequestMapping(value = "/csv", method = RequestMethod.POST)
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, String name,
-                                                     RedirectAttributes redirectAttributes) throws IOException {
+    public String handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
 
         String nombreFichero = file.getOriginalFilename();
         String uriFichero2222 = "src/main/resources/static/csv/Salida_" + nombreFichero;
@@ -176,8 +184,8 @@ public class UrlShortenerController {
         csv.CalcularTotal(new InputStreamReader
                 (file.getInputStream(), StandardCharsets.UTF_8));
         total = csv.total();
-        if(total > 0) {
-            ejemplo = new InputStreamReader(file.getInputStream());
+        if(total > 10) {
+            InputCsv = new InputStreamReader(file.getInputStream());
             String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
             String resultadoEscalable = "escalable," + total + "," + respuestaDescarga + "," + nombreFichero;
             return resultadoEscalable;
@@ -190,40 +198,46 @@ public class UrlShortenerController {
 
         csv.guardar(nombreFichero);
 
-        System.out.println("LO HA GUARDADO.");
-
-
         String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
-        String resultado = total + "," + acortadas + "," + respuestaDescarga;
+        String resultado = total + "," + respuestaDescarga;
         return resultado;
 
 
     }
 
-//response.setheader (content-disposition) "attachment; filename"
-        @RequestMapping(value = "/download/{fileName}", method = RequestMethod.GET)
-        public ResponseEntity<Object> downloadFile(@PathVariable("fileName") String name) throws IOException
-        {
-            System.out.println("NOMBRE DESCARGAAAAA: " + name);
-            String filename = "src/main/resources/static/csv/Salida_" + name ;
-            File file = new File(filename);
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+    /**
+     * Download result file.
+     * @param name Name of file
+     * @return Response of download file with filename is "Salida" + name.
+     * @throws IOException
+     */
+    @RequestMapping(value = "/download/{fileName}", method = RequestMethod.GET)
+    public ResponseEntity<Object> downloadFile(@PathVariable("fileName") String name) throws IOException
+    {
+        System.out.println("NOMBRE DESCARGAAAAA: " + name);
+        String filename = "src/main/resources/static/csv/Salida_" + name ;
+        File file = new File(filename);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition",
-                    String.format("attachment; filename=\"%s\"", file.getName()));
-            headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-            headers.add("Pragma", "no-cache");
-            headers.add("Expires", "0");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition",
+                String.format("attachment; filename=\"%s\"", file.getName()));
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
 
-            ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
-                    .contentLength(file.length())
-                    .contentType(MediaType.parseMediaType("application/txt")).body(resource);
+        ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.parseMediaType("application/txt")).body(resource);
 
-            return responseEntity;
-        }
+        return responseEntity;
+    }
 
-
+    /**
+     * Delete file in database.
+     * @param name Name of file.
+     * @throws IOException
+     */
     @RequestMapping(value = "/delete/{fileName}", method = RequestMethod.GET)
     public void deleteFile(@PathVariable("fileName") String name) throws IOException
     {
@@ -234,14 +248,19 @@ public class UrlShortenerController {
         //Politica de empresa: Que borre semanalmente todos los ficheros generados que haya en el archivo?
     }
 
+    /**
+     * Returns an integer that indicates if the process of converting uri's of csv file
+     *      in short uri's has been correct.
+     * @param name Name of file
+     * @return -1 in case of error. Return result > -1 in otherwise.
+     * @throws IOException
+     */
     @RequestMapping(value = "/csvEscalable/{fileName}", method = RequestMethod.POST)
-    public int ConverterCSVEscalable(@NonNull MultipartFile nameFile, @PathVariable("fileName") String name) throws IOException {
-        System.out.println("AAAAAAA SOMOS FAMILIAAAAAAAA");
-        System.out.println(ejemplo);
+    public int ConverterCSVEscalable(@PathVariable("fileName") String name) throws IOException {
 
-        int total = csv.escalable(ejemplo, name);
+        int result = csv.escalable(InputCsv, name);
 
-        return total;
+        return result;
 
     }
 

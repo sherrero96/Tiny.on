@@ -29,17 +29,31 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Service
 public class CSVConverter {
-
+    /**
+     * Separator of strings in CSV file.
+     */
     public static final String SEPARATOR=",";
+
+    /**
+     * Variables to initialize
+     */
     private URIAvailable availableURI = new URIAvailable();
     private final ShortURLRepository shortURLRepository;
     private ShortURLService uris=null;
+
+    /**
+     * Variables to save the result
+     */
     private HashMap<String,String> resultados;
+
 
     public CSVConverter(ShortURLRepository shortURLRepository) {
         this.shortURLRepository = shortURLRepository;
     }
 
+    /**
+     * Counters to know the number of uri's in a file
+     */
     private int uriTotal = 0;
     private int uriCorrectas = 0;
 
@@ -51,6 +65,12 @@ public class CSVConverter {
      FORMATO CSV DEVUELTO:
      URI, ShortURI
      URI, ShortURI
+     */
+
+    /**
+     * Calculate the total number of uri's inside the file and save it in local variable "uriTotal"
+     * @param nameFile
+     * @throws IOException
      */
     public void CalcularTotal(@NonNull InputStreamReader nameFile) throws IOException {
         int cuenta = 0;
@@ -77,14 +97,29 @@ public class CSVConverter {
             }
         }
     }
+
+    /**
+     * Returns the total number of uri's
+     * @return uriTotal
+     */
     public int total (){
         return uriTotal;
     }
 
+    /**
+     * Returns the total number of short uri's
+     * @return uriTotal
+     */
     public int acortadas (){
         return uriCorrectas;
     }
 
+    /**
+     * Return HashMap with uri's and your short uri's.
+     *      If uri not available, it don't have short uri.
+     * @param nameFile is name of csv file.
+     * @return hashmap with the result of converter CSV file.
+     */
     public HashMap<String,String> ConverterCSV(@NonNull InputStreamReader nameFile){
         BufferedReader br = null;
 
@@ -99,54 +134,38 @@ public class CSVConverter {
 
             br = new BufferedReader(nameFile);
 
-            //CalcularTotal(br2);
-            //fw = new FileWriter("./csv/Salida.csv"); Las lineas comentadas son para otra funcion de pasar ED al fichero CSV
             if((line = br.readLine()) != null) {
 
                 // use comma as separator
                 datos = line.split(SEPARATOR);
 
-
                 if (availableURI.isURIAvailable(datos[0])) {
-                    // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
                     resultados.put(datos[0], link.getUri().toString());
                     uriCorrectas++;
 
-
                 } else {
                     resultados.put(datos[0], "URI NO AVAILABLE");
-
-
                 }
             }
             else{
                 resultados.put("Fichero vacío","");
             }
-
             while ((line = br.readLine()) != null) {
-
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-
 
                 if(availableURI.isURIAvailable(datos[0])){
                     // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
                     resultados.put(datos[0],link.getUri().toString());
                     uriCorrectas++;
-
-
                 }
                 else{
                     resultados.put(datos[0], "URI NO AVAILABLE");
-
-
                 }
-
             }
-            return resultados; //Hacer estructura de datos con los resultados, uris totales y uris correctas.
-
+            return resultados;
 
         }catch (IOException e) {
             e.printStackTrace();
@@ -162,35 +181,35 @@ public class CSVConverter {
         }
     }
 
-    public File guardar(String name) throws IOException {
+    /**
+     * Save the hashmap stored in local variable "resultados" in a file in the database with the name "name".
+     * @param name is name of file.
+     * @throws IOException
+     */
+    public void guardar(String name) throws IOException {
         System.out.println(name);
         String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
-        //File file = new File("src/main/resources/static/csv/Salida.csv");
         File file = new File(nombreFichero);
         boolean p = file.createNewFile();
         if(p){
-
             FileWriter fw = new FileWriter(file);
             for(Map.Entry<String,String> entry : resultados.entrySet()){
 
-
-                //fw.write("Adios");
                 fw.append(entry.getKey()).append(", ").append(entry.getValue()).append("\n");
             }
             fw.close();
         }
-
-        return file;
     }
 
-    @RequestMapping(value = "/{id:(?!link|index).*}/csvEstado", method = RequestMethod.GET)
-    public String obtainCsv(HttpServletRequest request, HttpServletResponse response) {
-        return "forward:/static/csvEstado.html";
-    }
-
-
+    /**
+     * Returns an integer that indicates if the process of converting uri's of csv file
+     *      in short uri's has been correct and store the result in ResultFile in the database.
+     * @param nameFile is InputStream of CSV file for reader its content.
+     * @param name is name of File
+     * @return -1 in case of error. Return result > -1 in otherwise.
+     * @throws IOException
+     */
     public int escalable(InputStreamReader nameFile, String name) throws IOException {
-        System.out.println("AAAAAAA SOMOS FAMILIAAAAAAAA");
         BufferedReader br = null;
 
         String[] datos = null;
@@ -198,42 +217,29 @@ public class CSVConverter {
         ShortURL link;
         uriCorrectas = 0;
         resultados = new LinkedHashMap<String,String>();
-        System.out.println("CHIVATO UNO");
         uris = new ShortURLService(this.shortURLRepository);
 
         String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
         File file = new File(nombreFichero);
         boolean p = file.createNewFile();
         FileWriter fw = new FileWriter(file);
-
         try {
-
             br = new BufferedReader(nameFile);
 
-            //CalcularTotal(br2);
-            //fw = new FileWriter("./csv/Salida.csv"); Las lineas comentadas son para otra funcion de pasar ED al fichero CSV
             if((line = br.readLine()) != null) {
-                System.out.println("CHIVATO DOS");
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-
-
                 if (availableURI.isURIAvailable(datos[0])) {
-                    // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
+
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
 
                     String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
                     fw.append(prueba);
 
                     uriCorrectas++;
-
-
                 } else {
                     String prueba2 = datos[0] + ", " + "URI NO AVAILABLE" + "\n";
                     fw.append(prueba2);
-
-
-
                 }
             }
             else{
@@ -246,9 +252,8 @@ public class CSVConverter {
                 // use comma as separator
                 datos = line.split(SEPARATOR);
 
-                System.out.println("CHIVATO 333333");
                 if (availableURI.isURIAvailable(datos[0])) {
-                    // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
+
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
 
                     String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
@@ -264,9 +269,8 @@ public class CSVConverter {
                 }
 
             }
-            System.out.println("CHIVATO CUATROOOOO");
             fw.close();
-            return uriCorrectas; //Hacer estructura de datos con los resultados, uris totales y uris correctas.
+            return uriCorrectas;
 
 
         }catch (IOException e) {
