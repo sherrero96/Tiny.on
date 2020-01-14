@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.net.URI;
+import java.sql.Date;
+import java.util.Calendar;
 
 @RestController
 public class UrlShortenerController {
@@ -54,7 +56,7 @@ public class UrlShortenerController {
             if(availableURI.isURIAvailable(l.getTarget())){
                 // Obtain all the information about the request and save in the DB
                 clickService.saveClick(id, extractIP(request), extractCountry(request),
-                        extractPlatform(request));
+                        extractPlatform(request), new Date(Calendar.getInstance().getTime().getTime()));
                 return createSuccessfulRedirectToResponse(l);
             }else{
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
