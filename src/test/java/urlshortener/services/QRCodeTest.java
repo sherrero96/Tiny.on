@@ -120,8 +120,8 @@ public class QRCodeTest {
 		assertEquals("OPEN", qrBadAPI.getCircuitState());
 	}
 
-/*	@Test
-	@CacheEvict(value="qr", allEntries=true)
+	@Test
+	@CacheEvict(value="{qr, lastStats}", allEntries=true)
 	public void cache() {
 		QRCodeService qrCode = new QRCodeService();
 		
@@ -136,7 +136,6 @@ public class QRCodeTest {
 		// Could be more robust
 		assertTrue((end_hit - start_hit) < (end_fail - start_fail));
 	}
-*/
 
 	/** Private functions used in tests */
 	private String decode(byte[] image) {

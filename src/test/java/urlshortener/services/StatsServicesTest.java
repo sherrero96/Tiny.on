@@ -11,6 +11,7 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -91,6 +92,7 @@ public class StatsServicesTest {
 
 
     @Test
+    @CacheEvict(value="{qr, lastStats}", allEntries=true)
     public void statsNotEmptyReturnDataWithCacheIsFaster() throws InterruptedException, IOException {
         // Register a new click from localhost
         clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
