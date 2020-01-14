@@ -140,9 +140,15 @@ public class StatsServicesTest {
         Response response = client.newCall(request).execute();
         long timeWithoutCache = System.currentTimeMillis() - timeBefore;
 
-        // We call a new petition
+        // We call a new petition with any update
+        OkHttpClient client2 = new OkHttpClient.Builder()
+                .build();
+        // Create the request to the uri
+        Request request2 = new Request.Builder()
+                .url("http://localhost:" + port + "/f656/stats")
+                .build();
         timeBefore = System.currentTimeMillis();
-        response = client.newCall(request).execute();
+        response = client2.newCall(request2).execute();
         long timeWithCache = System.currentTimeMillis() - timeBefore;
 
         assert timeWithoutCache > timeWithCache;
