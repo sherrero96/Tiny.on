@@ -16,7 +16,6 @@ public class HazelcastCacheConfig {
                 .addMapConfig(new MapConfig().setName("qr")
                 .setMaxSizeConfig(new MaxSizeConfig(500,MaxSizeConfig.MaxSizePolicy.FREE_HEAP_SIZE))
                 .setEvictionPolicy(EvictionPolicy.LRU)
-                .setTimeToLiveSeconds(0)); // Infinite
+                .setTimeToLiveSeconds(50000)); // Infinite(0)
     }
-
 }

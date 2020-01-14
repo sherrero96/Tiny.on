@@ -43,8 +43,8 @@ public class UrlShortenerController {
 
     /**
      * UrlShortenerController constructor
-     * @param shortUrlService ShortURLService
-     * @param clickServcice ClickService
+     * @param shortUrlService ShortURLService that makes url shortener
+     * @param clickServcice ClickService that counts and saves stadistics
      */
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
@@ -53,8 +53,8 @@ public class UrlShortenerController {
 
     /**
      * Access shorten-url with specific id, update stadistics.
-     * @param id String
-     * @param request HttpServletRequest   
+     * @param id String that identifies short url
+     * @param request HttpServletRequest the request  
      * @return HttpEntity
      */
     @RequestMapping(value = "/{id:(?!link|index|stats).*}", method = RequestMethod.GET)
@@ -98,9 +98,9 @@ public class UrlShortenerController {
     /**
      * Save URI
      * 
-     * @param url String
-     * @param sponsor String
-     * @param request HttpServletRequest     
+     * @param url String url to be shortened
+     * @param sponsor String sponsor related to url
+     * @param request HttpServletRequest request     
      * @return HttpEntity
      */
     @RequestMapping(value = "/link", method = RequestMethod.POST)
@@ -132,7 +132,7 @@ public class UrlShortenerController {
 
     /**
      * Return the country of the request, using a API geoLocation
-     * @param request The request
+     * @param request The user request
      * @return string with the country of the request
      */
     private String extractCountry(HttpServletRequest request){
@@ -157,8 +157,8 @@ public class UrlShortenerController {
 
     /**
      * Returns the plataform of the request
-     * @param request HttpServletRequest
-     * @return String plataform
+     * @param request HttpServletRequest is the request
+     * @return String plataform, operative system of request
      */
     private String extractPlatform(HttpServletRequest request){
         UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));

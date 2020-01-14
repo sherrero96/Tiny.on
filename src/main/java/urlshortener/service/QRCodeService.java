@@ -74,7 +74,7 @@ public class QRCodeService {
 	/**
 	 * QRCodeService with specific API
 	 * 
-	 * @param api String
+	 * @param api string that contains the API url
 	 */
 	public QRCodeService(@NonNull String api) {
 		URL_QR_API = api;
@@ -110,7 +110,7 @@ public class QRCodeService {
 	/**
 	 * Get QR image from a given text
 	 * 
-	 * @param short_url
+	 * @param short_url is the short url encoded as QR
 	 * @return QR image as input stream
 	 */
 	@Cacheable(value="qr", key="#short_url")
@@ -134,7 +134,7 @@ public class QRCodeService {
 	/**
 	 * Makes API request in order to get QR image as byte stream
 	 * 
-	 * @param short_url Text to be converted into image
+	 * @param short_url text to be converted into image
 	 * @return QR image as input stream
 	 * @throws Exception
 	 */
@@ -164,7 +164,7 @@ public class QRCodeService {
 	/**
 	 * Create QR image and return it as a byte stream
 	 * 
-	 * @param short_url Text to be converted into image
+	 * @param short_url text to be converted into image
 	 * @return QR image as input stream
 	 */
 	@CachePut(value="qr", key="#short_url")
