@@ -25,6 +25,7 @@ import urlshortener.service.StatsService;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Date;
+import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -100,7 +101,8 @@ public class StatsServicesTest {
     public void statsNotEmptyReturnData() throws IOException {
 
         // Register a new click from localhost
-        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
+        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug",
+                new Date(Calendar.getInstance().getTime().getTime()));
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
@@ -123,7 +125,8 @@ public class StatsServicesTest {
     @Test
     public void statsNotEmptyReturnDataWithCacheIsFaster() throws IOException {
         // Register a new click from localhost
-        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
+        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug",
+                new Date(Calendar.getInstance().getTime().getTime()));
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
@@ -137,9 +140,15 @@ public class StatsServicesTest {
         Response response = client.newCall(request).execute();
         long timeWithoutCache = System.currentTimeMillis() - timeBefore;
 
-        // We call a new petition
+        // We call a new petition with any update
+        OkHttpClient client2 = new OkHttpClient.Builder()
+                .build();
+        // Create the request to the uri
+        Request request2 = new Request.Builder()
+                .url("http://localhost:" + port + "/f656/stats")
+                .build();
         timeBefore = System.currentTimeMillis();
-        response = client.newCall(request).execute();
+        response = client2.newCall(request2).execute();
         long timeWithCache = System.currentTimeMillis() - timeBefore;
 
         assert timeWithoutCache > timeWithCache;
