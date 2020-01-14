@@ -142,6 +142,7 @@ public class CSVConverter {
 
                 if (availableURI.isURIAvailable(datos[0])) {
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
                     resultados.put(datos[0], link.getUri().toString());
                     uriCorrectas++;
 
@@ -155,10 +156,10 @@ public class CSVConverter {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-                System.out.println(datos);
                 if(availableURI.isURIAvailable(datos[0])){
                     // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
                     resultados.put(datos[0],link.getUri().toString());
                     uriCorrectas++;
                 }
@@ -230,11 +231,10 @@ public class CSVConverter {
             if ((line = br.readLine()) != null) {
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-                System.out.println(datos);
 
                 if (availableURI.isURIAvailable(datos[0])) {
-
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
 
                     String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
                     fw.append(prueba);
@@ -253,11 +253,10 @@ public class CSVConverter {
 
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-
-                System.out.println(datos);
                 if (availableURI.isURIAvailable(datos[0])) {
 
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
 
                     String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
                     fw.append(prueba);
