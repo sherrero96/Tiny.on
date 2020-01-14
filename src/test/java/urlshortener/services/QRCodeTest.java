@@ -103,8 +103,7 @@ public class QRCodeTest {
 
 	/**
 	 * Simulates API shut down so circuit will have to be open 
-	 * 
-	 * @param image
+	 *
 	 * @return
 	 */
 	@Test
