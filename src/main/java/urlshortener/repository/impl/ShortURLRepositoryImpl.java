@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
+import urlshortener.service.Crypt;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +24,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> new ShortURL(rs.getString("hash"), rs.getString("target"),
             null, rs.getString("sponsor"), rs.getDate("created"),
             rs.getString("owner"), rs.getInt("mode"),
-            rs.getBoolean("safe"), rs.getString("ip"),
+            rs.getBoolean("safe"), Crypt.decrypt(rs.getString("ip")),
             rs.getString("country"));
 
     private JdbcTemplate jdbc;
@@ -49,7 +50,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
             jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?)",
                     su.getHash(), su.getTarget(), su.getSponsor(),
                     su.getCreated(), su.getOwner(), su.getMode(), su.getSafe(),
-                    su.getIP(), su.getCountry());
+                    Crypt.encrypt(su.getIP()), su.getCountry());
         } catch (DuplicateKeyException e) {
             log.debug("When insert for key {}", su.getHash(), e);
             return su;
@@ -81,7 +82,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
             jdbc.update(
                     "update shorturl set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
                     su.getTarget(), su.getSponsor(), su.getCreated(),
-                    su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
+                    su.getOwner(), su.getMode(), su.getSafe(), Crypt.encrypt(su.getIP()),
                     su.getCountry(), su.getHash());
         } catch (Exception e) {
             log.debug("When update for hash {}", su.getHash(), e);

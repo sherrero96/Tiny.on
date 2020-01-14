@@ -17,7 +17,9 @@ public class Crypt {
      */
     public static String encrypt(String strClearText){
         String strData="";
-
+        if(strClearText == null){
+            strClearText = "null";
+        }
         try {
             Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
             Cipher cipher=Cipher.getInstance("AES");
@@ -45,7 +47,6 @@ public class Crypt {
      */
     public static String decrypt(String strEncrypted){
         String strData="";
-
         try {
             Key aesKey = new SecretKeySpec(key.getBytes(), "AES");
             Cipher cipher=Cipher.getInstance("AES");
