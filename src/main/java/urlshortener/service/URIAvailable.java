@@ -64,7 +64,7 @@ public class URIAvailable {
 
     /**
      * Save the uri in the hashmap for check
-     * @param uri
+     * @param uri the uri to register in the hashmap
      */
     public void saveURI(String uri){
         if(!map.containsKey(uri) && checkUriAvailable(uri)){
@@ -74,8 +74,8 @@ public class URIAvailable {
 
     /**
      * Check if the uri is available, searching in the hashmap or get petition
-     * @param uri
-     * @return
+     * @param uri the uri to check if is available
+     * @return true if is available or false if not
      */
     public boolean isURIAvailable(String uri){
         boolean isAvailable = false;
