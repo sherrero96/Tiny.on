@@ -26,6 +26,7 @@ import urlshortener.service.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,6 +34,11 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.io.IOException;
+import java.net.URI;
+import java.sql.Date;
+import java.util.Calendar;
+
 
 @RestController
 public class UrlShortenerController {
@@ -61,7 +67,7 @@ public class UrlShortenerController {
             if(availableURI.isURIAvailable(l.getTarget())){
                 // Obtain all the information about the request and save in the DB
                 clickService.saveClick(id, extractIP(request), extractCountry(request),
-                        extractPlatform(request));
+                        extractPlatform(request), new Date(Calendar.getInstance().getTime().getTime()));
                 return createSuccessfulRedirectToResponse(l);
             }else{
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -69,6 +75,22 @@ public class UrlShortenerController {
         }else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @RequestMapping(value = "/qr", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
+        ShortURL l = shortUrlService.findByKey(id);
+        if (l != null && availableURI.isURIAvailable(l.getTarget())) {
+			String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+			byte[] in = qrCode.getQRImage(baseUrl + '/' + id);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.IMAGE_PNG);
+			
+			return new ResponseEntity<>(in, headers, HttpStatus.CREATED);
+		}
+		else {
+			return ResponseEntity.badRequest().build();
+		}
     }
 
 
