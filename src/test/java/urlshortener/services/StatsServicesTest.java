@@ -25,6 +25,7 @@ import urlshortener.service.StatsService;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Date;
+import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -100,7 +101,8 @@ public class StatsServicesTest {
     public void statsNotEmptyReturnData() throws IOException {
 
         // Register a new click from localhost
-        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
+        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug",
+                new Date(Calendar.getInstance().getTime().getTime()));
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
@@ -123,7 +125,8 @@ public class StatsServicesTest {
     @Test
     public void statsNotEmptyReturnDataWithCacheIsFaster() throws IOException {
         // Register a new click from localhost
-        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug");
+        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug",
+                new Date(Calendar.getInstance().getTime().getTime()));
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
