@@ -1,7 +1,6 @@
 package urlshortener.web;
 
 import eu.bitwalker.useragentutils.UserAgent;
-import jdk.internal.loader.Resource;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -10,7 +9,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,33 +17,30 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import urlshortener.domain.ShortURL;
-import urlshortener.service.ClickService;
-import urlshortener.service.QRCodeService;
-import urlshortener.service.ShortURLService;
-import urlshortener.service.URIAvailable;
-import urlshortener.service.CSVConverter;
+import urlshortener.service.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Scanner;
 
 @RestController
 public class UrlShortenerController {
     private final ShortURLService shortUrlService;
-
-    private final ClickService clickService;
     private final CSVConverter csv;
     private InputStreamReader InputCsv;
+
+    private final ClickService clickService;
 
     @Autowired
     private URIAvailable availableURI = new URIAvailable(); // To check if a URI is reachable
@@ -59,7 +54,7 @@ public class UrlShortenerController {
         this.csv = csv;
     }
 
-    @RequestMapping(value = "/{id:(?!link|index|stats).*}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id:(?!link|index|stats|error404.html).*}", method = RequestMethod.GET)
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
         if(l != null){
@@ -76,20 +71,10 @@ public class UrlShortenerController {
         }
     }
 
-    @RequestMapping(value = "/qr", method = RequestMethod.GET)
-    public void qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
-        ShortURL l = shortUrlService.findByKey(id);
-        if (l != null && availableURI.isURIAvailable(l.getTarget())) {
-            String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-            InputStream in = qrCode.getQRImage(baseUrl + '/' + id);
-            response.setContentType(MediaType.IMAGE_PNG_VALUE);
-            IOUtils.copy(in, response.getOutputStream());
-        }
-    }
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-            @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
+                                              @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
         UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
 
         // If the uri is valid and reachable, it is shortened.
@@ -123,7 +108,7 @@ public class UrlShortenerController {
         HttpRequestBase httpReq = new HttpGet("http://ip-api.com/json/"+request.getRemoteAddr());
         HttpClient httpclient = HttpClientBuilder.create().build();
         HttpResponse response = null;
-        String result = "Unknown";
+        String result = "Desconocido";
         try {
             response = httpclient.execute(httpReq); // Execute the petition
             HttpEntity responseEntity = response.getEntity();
@@ -154,9 +139,6 @@ public class UrlShortenerController {
         h.setLocation(URI.create(l.getTarget()));
         return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
     }
-
-
-//ResponseEntity<InputStreamResource>
 
     /**
      * Returns a string with the different results separated by a comma.
@@ -263,7 +245,4 @@ public class UrlShortenerController {
         return result;
 
     }
-
-
-
 }
