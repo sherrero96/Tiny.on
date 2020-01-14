@@ -35,8 +35,8 @@ dependencies {
     implementation 'org.json:json:20190722'
     implementation 'com.squareup.okhttp3:okhttp:4.2.1'
 
-    implementation 'com.hazelcast:hazelcast:3.12.5'
-    implementation 'com.hazelcast:hazelcast-spring:3.12.5'
+    // implementation 'com.hazelcast:hazelcast:3.12.5'
+    // implementation 'com.hazelcast:hazelcast-spring:3.12.5'
 
 
     runtime 'org.webjars:bootstrap:3.3.5'
