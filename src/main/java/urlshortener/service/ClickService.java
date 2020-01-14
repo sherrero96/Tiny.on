@@ -24,7 +24,7 @@ public class ClickService {
         this.clickRepository = clickRepository;
     }
 
-    @CacheEvict(key = "#hash", value = "lastStats", allEntries = true)
+    @CacheEvict(key = "#hash", value = "lastStats")
     public void saveClick(String hash, String ip, String country, String platform, Date date) {
         Click cl = ClickBuilder.newInstance().hash(hash).createdNow().ip(ip).country(country).platform(platform).created(date).build();
         cl = clickRepository.save(cl);
