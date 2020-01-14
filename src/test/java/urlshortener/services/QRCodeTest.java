@@ -126,37 +126,37 @@ public class QRCodeTest {
 	 * Checks cached data is obtained in less time rather than when it's not
 	 * 
 	 */
-	// @Test
-	// @CacheEvict(value="{qr, lastStats}", allEntries=true)
-	// public void cache() {
-	// 	QRCodeService qrCode = new QRCodeService();
+	@Test
+	@CacheEvict(value="{qr, lastStats}", allEntries=true)
+	public void cache() {
+		QRCodeService qrCode = new QRCodeService();
 		
-	// 	long startFail = System.currentTimeMillis();
-	// 	qrCode.getQRImage("https://www.google.com");
-	// 	long endFail = System.currentTimeMillis();
-	// 	long timeFail = endFail - startFail;
+		long startFail = System.currentTimeMillis();
+		qrCode.getQRImage("https://www.google.com");
+		long endFail = System.currentTimeMillis();
+		long timeFail = endFail - startFail;
 
-	// 	long startHit = System.currentTimeMillis();
-	// 	qrCode.getQRImage("https://www.google.com");
-	// 	long endHit = System.currentTimeMillis();
-	// 	long timeHit = endHit - startHit;
+		long startHit = System.currentTimeMillis();
+		qrCode.getQRImage("https://www.google.com");
+		long endHit = System.currentTimeMillis();
+		long timeHit = endHit - startHit;
 
-	// 	boolean cacheHitLessTime = timeHit < timeFail;
-	// 	log.info("fail " + endFail);
-	// 	log.info("hit " + endHit);
-	// 	log.debug("fail " + endFail);
-	// 	log.debug("hit " + endHit);
+		boolean cacheHitLessTime = timeHit < timeFail;
+		log.info("fail " + endFail);
+		log.info("hit " + endHit);
+		log.debug("fail " + endFail);
+		log.debug("hit " + endHit);
 
-	// 	// Could be more robust
-	// 	assertTrue(cacheHitLessTime);
-	// }
+		// Could be more robust
+		assertTrue(cacheHitLessTime);
+	}
 
 	/** Private functions used in tests */
 
 	/**
 	 * Decoded given QR as a byte array 
 	 * 
-	 * @param image byte[] 
+	 * @param image is the image encoded
 	 * @return QR content as String
 	 */
 	private String decode(byte[] image) {
