@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+
 public class QRCodeTest {
 
 	private QRCodeService qr = new QRCodeService();
@@ -46,10 +47,10 @@ public class QRCodeTest {
 	@Test
 	public void correctQRCodeFromAPI() {
 		try {
-			byte[] query_image = qr.getQRImageFromAPI("https://www.google.com");
-			byte[] stored_image = Files.readAllBytes(Paths.get(GOOGLE_QR_IMAGE_PATH));
+			byte[] queryImage = qr.getQRImageFromAPI("https://www.google.com");
+			byte[] storedImage = Files.readAllBytes(Paths.get(GOOGLE_QR_IMAGE_PATH));
 
-			assertTrue(Arrays.equals(query_image, stored_image));
+			assertTrue(Arrays.equals(queryImage, storedImage));
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -65,10 +66,10 @@ public class QRCodeTest {
 	@Test
 	public void incorrectQRCodeFromAPI() {
 		try {
-			byte[] query_image = qr.getQRImageFromAPI("https://www.habbo.es");
-			byte[] stored_image = FileUtils.readFileToByteArray(new File(GOOGLE_QR_IMAGE_PATH));
+			byte[] queryImage = qr.getQRImageFromAPI("https://www.habbo.es");
+			byte[] storedImage = FileUtils.readFileToByteArray(new File(GOOGLE_QR_IMAGE_PATH));
 
-			assertNotEquals(query_image, stored_image);
+			assertNotEquals(queryImage, storedImage);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -83,9 +84,9 @@ public class QRCodeTest {
 	 */
 	@Test
 	public void correctQRCodeGenerated() {
-		byte[] query_image = qr.generateQRImage("https://www.google.com");
+		byte[] queryImage = qr.generateQRImage("https://www.google.com");
 
-		assertEquals("https://www.google.com", decode(query_image));
+		assertEquals("https://www.google.com", decode(queryImage));
 	}
 
 	/**
@@ -96,9 +97,9 @@ public class QRCodeTest {
 	 */
 	@Test
 	public void incorrectQRGenerated() {
-		byte[] query_image = qr.generateQRImage("https://www.habbo.es");
+		byte[] queryImage = qr.generateQRImage("https://www.habbo.es");
 
-		assertNotEquals("https://www.google.com", decode(query_image));
+		assertNotEquals("https://www.google.com", decode(queryImage));
 	}
 
 	/**
@@ -130,13 +131,17 @@ public class QRCodeTest {
 		long startFail = System.currentTimeMillis();
 		qrCode.getQRImage("https://www.google.com");
 		long endFail = System.currentTimeMillis();
+		long timeFail = endFail - startFail;
 
 		long startHit = System.currentTimeMillis();
 		qrCode.getQRImage("https://www.google.com");
 		long endHit = System.currentTimeMillis();
+		long timeHit = endHit - startHit;
+
+		boolean cacheHitLessTime = timeHit < timeFail;
 
 		// Could be more robust
-		assertTrue((endHit - startHit) < (endFail - startFail));
+		assertTrue(cacheHitLessTime);
 	}
 
 	/** Private functions used in tests */
