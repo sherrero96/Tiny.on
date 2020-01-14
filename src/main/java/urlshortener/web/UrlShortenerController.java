@@ -25,7 +25,6 @@ import urlshortener.service.ShortURLService;
 import urlshortener.service.URIAvailable;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.net.URI;
@@ -42,11 +41,22 @@ public class UrlShortenerController {
     @Autowired
     private QRCodeService qrCode = new QRCodeService();
 
+    /**
+     * UrlShortenerController constructor
+     * @param shortUrlService ShortURLService
+     * @param clickServcice ClickService
+     */
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService) {
         this.shortUrlService = shortUrlService;
         this.clickService = clickService;
     }
 
+    /**
+     * Access shorten-url with specific id, update stadistics.
+     * @param id String
+     * @param request HttpServletRequest   
+     * @return HttpEntity
+     */
     @RequestMapping(value = "/{id:(?!link|index|stats).*}", method = RequestMethod.GET)
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
@@ -64,8 +74,13 @@ public class UrlShortenerController {
         }
     }
 
+    /**
+     * Returns the QR code of given id
+     * @param id URI id to be encoded as QR     
+     * @return HttpEntity
+     */
     @RequestMapping(value = "/qr", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
+    public ResponseEntity<byte[]> qr(@RequestParam("id") String id) throws IOException {
         ShortURL l = shortUrlService.findByKey(id);
         if (l != null && availableURI.isURIAvailable(l.getTarget())) {
 			String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
@@ -80,6 +95,14 @@ public class UrlShortenerController {
 		}
     }
 
+    /**
+     * Save URI
+     * 
+     * @param url String
+     * @param sponsor String
+     * @param request HttpServletRequest     
+     * @return HttpEntity
+     */
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
             @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
@@ -132,6 +155,11 @@ public class UrlShortenerController {
         return result;
     }
 
+    /**
+     * Returns the plataform of the request
+     * @param request HttpServletRequest
+     * @return String plataform
+     */
     private String extractPlatform(HttpServletRequest request){
         UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
         return userAgent.getOperatingSystem().getName();

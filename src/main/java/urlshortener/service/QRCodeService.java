@@ -57,13 +57,25 @@ public class QRCodeService {
 	private static final int NUM_LLAMADAS_EVALUAR_ESTADO = 2;
 
 	// Máximo número de veces que se intenta utilizar la API
-	private static final int MAX_REINTENTOS = 2;
+	private static final int MAX_REINTENTOS = 1;
+
+	// Tiempo en open state
+	private static final int DURATION_OPEN = 200;
 	
+	/**
+	 * QRCodeService with default API
+	 * 
+	 */
 	public QRCodeService() {
 		URL_QR_API = "https://api.qrserver.com/v1/create-qr-code/";
 		setCircuit();
 	}
 
+	/**
+	 * QRCodeService with specific API
+	 * 
+	 * @param api String
+	 */
 	public QRCodeService(@NonNull String api) {
 		URL_QR_API = api;
 		setCircuit();
@@ -78,6 +90,7 @@ public class QRCodeService {
 					.slowCallDurationThreshold(Duration.ofSeconds(TIEMPO_LLAMADA_LENTA))
 					.waitDurationInOpenState(Duration.ofSeconds(MIN_LLAMADAS_ANTES_CLOSE))
 					.minimumNumberOfCalls(NUM_LLAMADAS_EVALUAR_ESTADO)
+					.waitDurationInOpenState(Duration.ofMillis(DURATION_OPEN))
 					.build();
 
 		CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(config);

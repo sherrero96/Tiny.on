@@ -102,10 +102,8 @@ public class QRCodeTest {
 	}
 
 	/**
-	 * Simulates API shut down so circuit will have to be open 
+	 * Simulates API shut down so circuit will have to be open
 	 * 
-	 * @param image
-	 * @return
 	 */
 	@Test
 	public void forceOpenCircuit() {
@@ -116,28 +114,39 @@ public class QRCodeTest {
 		// API is down so circuit must be open after requests
 		qrBadAPI.getQRImage("https://www.google.com");
 		qrBadAPI.getQRImage("https://www.google.com");
-
+		
 		assertEquals("OPEN", qrBadAPI.getCircuitState());
 	}
 
+	/**
+	 * Checks cached data is obtained in less time rather than when it's not
+	 * 
+	 */
 	@Test
 	@CacheEvict(value="{qr, lastStats}", allEntries=true)
 	public void cache() {
 		QRCodeService qrCode = new QRCodeService();
 		
-		long start_fail = System.currentTimeMillis();
+		long startFail = System.currentTimeMillis();
 		qrCode.getQRImage("https://www.google.com");
-		long end_fail = System.currentTimeMillis();
+		long endFail = System.currentTimeMillis();
 
-		long start_hit = System.currentTimeMillis();
+		long startHit = System.currentTimeMillis();
 		qrCode.getQRImage("https://www.google.com");
-		long end_hit = System.currentTimeMillis();
+		long endHit = System.currentTimeMillis();
 
 		// Could be more robust
-		assertTrue((end_hit - start_hit) < (end_fail - start_fail));
+		assertTrue((endHit - startHit) < (endFail - startFail));
 	}
 
 	/** Private functions used in tests */
+
+	/**
+	 * Decoded given QR as a byte array 
+	 * 
+	 * @param image byte[] 
+	 * @return QR content as String
+	 */
 	private String decode(byte[] image) {
 		try {
 			BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
