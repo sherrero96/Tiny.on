@@ -164,7 +164,7 @@ public class CSVConverter {
 
     public File guardar(String name) throws IOException {
         System.out.println(name);
-        String nombreFichero = "src/main/resources/static/csv/Salida_" + name + ".csv";
+        String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
         //File file = new File("src/main/resources/static/csv/Salida.csv");
         File file = new File(nombreFichero);
         boolean p = file.createNewFile();
@@ -186,6 +186,101 @@ public class CSVConverter {
     @RequestMapping(value = "/{id:(?!link|index).*}/csvEstado", method = RequestMethod.GET)
     public String obtainCsv(HttpServletRequest request, HttpServletResponse response) {
         return "forward:/static/csvEstado.html";
+    }
+
+
+    public int escalable(InputStreamReader nameFile, String name) throws IOException {
+        System.out.println("AAAAAAA SOMOS FAMILIAAAAAAAA");
+        BufferedReader br = null;
+
+        String[] datos = null;
+        String line = "";
+        ShortURL link;
+        uriCorrectas = 0;
+        resultados = new LinkedHashMap<String,String>();
+        System.out.println("CHIVATO UNO");
+        uris = new ShortURLService(this.shortURLRepository);
+
+        String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
+        File file = new File(nombreFichero);
+        boolean p = file.createNewFile();
+        FileWriter fw = new FileWriter(file);
+
+        try {
+
+            br = new BufferedReader(nameFile);
+
+            //CalcularTotal(br2);
+            //fw = new FileWriter("./csv/Salida.csv"); Las lineas comentadas son para otra funcion de pasar ED al fichero CSV
+            if((line = br.readLine()) != null) {
+                System.out.println("CHIVATO DOS");
+                // use comma as separator
+                datos = line.split(SEPARATOR);
+
+
+                if (availableURI.isURIAvailable(datos[0])) {
+                    // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
+                    link = uris.save(datos[0], "Twitter", "127.0.0.1");
+
+                    String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
+                    fw.append(prueba);
+
+                    uriCorrectas++;
+
+
+                } else {
+                    String prueba2 = datos[0] + ", " + "URI NO AVAILABLE" + "\n";
+                    fw.append(prueba2);
+
+
+
+                }
+            }
+            else{
+                String prueba3 = "Fichero vacio" + "\n";
+                fw.append(prueba3);
+            }
+
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                datos = line.split(SEPARATOR);
+
+                System.out.println("CHIVATO 333333");
+                if (availableURI.isURIAvailable(datos[0])) {
+                    // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
+                    link = uris.save(datos[0], "Twitter", "127.0.0.1");
+
+                    String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
+                    fw.append(prueba);
+
+                    uriCorrectas++;
+
+
+                } else {
+                    String prueba2 = datos[0] + ", " + "URI NO AVAILABLE" + "\n";
+                    fw.append(prueba2);
+
+                }
+
+            }
+            System.out.println("CHIVATO CUATROOOOO");
+            fw.close();
+            return uriCorrectas; //Hacer estructura de datos con los resultados, uris totales y uris correctas.
+
+
+        }catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }

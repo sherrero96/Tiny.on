@@ -45,6 +45,7 @@ public class UrlShortenerController {
 
     private final ClickService clickService;
     private final CSVConverter csv;
+    private InputStreamReader ejemplo;
 
     @Autowired
     private URIAvailable availableURI = new URIAvailable(); // To check if a URI is reachable
@@ -161,24 +162,35 @@ public class UrlShortenerController {
                                                      RedirectAttributes redirectAttributes) throws IOException {
 
         String nombreFichero = file.getOriginalFilename();
+        String uriFichero2222 = "src/main/resources/static/csv/Salida_" + nombreFichero;
+        File fff = new File(uriFichero2222);
+        while(fff.exists()){
+            nombreFichero = String.valueOf(nombreFichero.hashCode()) + ".csv";
+            System.out.println("HASH CODE : " + nombreFichero);
+            uriFichero2222 = "src/main/resources/static/csv/Salida_" + nombreFichero;
+            fff = new File(uriFichero2222);
+        }
 
-
-
-        System.out.println("Empieza la función");
         int total;
+
         csv.CalcularTotal(new InputStreamReader
                 (file.getInputStream(), StandardCharsets.UTF_8));
         total = csv.total();
+        if(total > 0) {
+            ejemplo = new InputStreamReader(file.getInputStream());
+            String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
+            String resultadoEscalable = "escalable," + total + "," + respuestaDescarga + "," + nombreFichero;
+            return resultadoEscalable;
+
+        }
+
         HashMap<String, String> strings = csv.ConverterCSV(new InputStreamReader
                 (file.getInputStream(), StandardCharsets.UTF_8));
         int acortadas = csv.acortadas();
 
-        System.out.println("URI's Totales en el fichero: " + total);
-        System.out.println("URI's acortadas correctamente: " + acortadas);
+        csv.guardar(nombreFichero);
 
-        File file2 = csv.guardar(nombreFichero);
-
-        InputStreamResource resource = new InputStreamResource( new FileInputStream(file2));
+        System.out.println("LO HA GUARDADO.");
 
 
         String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
@@ -193,7 +205,7 @@ public class UrlShortenerController {
         public ResponseEntity<Object> downloadFile(@PathVariable("fileName") String name) throws IOException
         {
             System.out.println("NOMBRE DESCARGAAAAA: " + name);
-            String filename = "src/main/resources/static/csv/Salida_" + name + ".csv";
+            String filename = "src/main/resources/static/csv/Salida_" + name ;
             File file = new File(filename);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
@@ -222,7 +234,16 @@ public class UrlShortenerController {
         //Politica de empresa: Que borre semanalmente todos los ficheros generados que haya en el archivo?
     }
 
+    @RequestMapping(value = "/csvEscalable/{fileName}", method = RequestMethod.POST)
+    public int ConverterCSVEscalable(@NonNull MultipartFile nameFile, @PathVariable("fileName") String name) throws IOException {
+        System.out.println("AAAAAAA SOMOS FAMILIAAAAAAAA");
+        System.out.println(ejemplo);
 
+        int total = csv.escalable(ejemplo, name);
+
+        return total;
+
+    }
 
 
 

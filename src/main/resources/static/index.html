@@ -45,65 +45,7 @@
             <br>
             <br>
 
-            <style>
-                #myProgress {
-                    width: 50%;
-                    background-color: #ddd;
-                    margin-left: auto;
-                    margin-right: auto;
 
-                }
-
-                #myBar {
-                    width: 1%;
-                    height: 30px;
-                    background-color: #4CAF50;
-                    text-align: center;
-                    line-height: 30px;
-                    color: white;
-                }
-            </style>
-
-
-            <h1> File.csv converter progress</h1>
-
-            <div id="myProgress">
-                <div id="myBar"></div>
-            </div>
-
-            <br>
-
-            <script>
-
-                var i = 0;
-                function move() {
-                    if (i == 0) {
-                        i = 1;
-                        var elem = document.getElementById("myBar");
-                        var width = 1;
-                        var id = setInterval(frame, 1);
-                        function frame() {
-                            if (width >= 100) {
-                                clearInterval(id);
-                                i = 0;
-                            } else {
-                                width++;
-                                sleep(20);
-                                elem.style.width = width + "%";
-                                elem.innerHTML = width  + "%";
-                            }
-                        }
-                    }
-                }
-                function sleep(milliseconds) {
-                    var start = new Date().getTime();
-                    for (var i = 0; i < 1e7; i++) {
-                        if ((new Date().getTime() - start) > milliseconds) {
-                            break;
-                        }
-                    }
-                }
-            </script>
 
         </div>
     </div>

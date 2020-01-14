@@ -10,7 +10,7 @@ $(document).ready(
                 var uploadFile = new FormData();
                 var files = $("#ficheroCsv").get(0).files;
                 uploadFile.append("CsvDoc", files[0]);*/
-
+                var fichero = new FormData(document.getElementById("uploaderCSV"));
 
                 //var formData = new FormData(uploaderCSV);
                 //var csv = ["http://www.marca.com"];
@@ -18,28 +18,73 @@ $(document).ready(
                 $.ajax({
                     type: "POST",
                     url: "/csv",
-                    data: new FormData(document.getElementById("uploaderCSV"), $(this).serialize()),
+                    data: fichero,
                     dataType: "html",
                     processData: false,
                     contentType: false,
                     //enctype: 'multipart/form-data',
                     success: function(total) {
                         //var total = 0;
-                        var data = total.split(",");
+                        var data1 = total.split(",");
                         //window.location='/download';
-                        $("#result2").html(
 
-                            "<h1>Numero URI's totales: </h1>"
-                            + data[0]
-                            +"<h1>Numero URI's acortadas: </h1>"
-                            + data[1]
-                            +
-                            "<br><a href="
-                            +data[2]
-                            +">"
-                            + "DESCARGAR FICHERO </a>"
+                        if(data1[0] === "escalable"){
+                            $("#result2").html(
 
-                        );
+                                "<h3>El fichero esta siendo procesado </h3>"
+                                + "<h4>Numero de URI's totales: </h4>"
+                                + data1[1]
+                                + "<br>"
+                                + "<h5>Puede descargar su fichero desde el siguiente enlace durante el proceso: </h5>"
+                                + "<a href="
+                                +data1[2]
+                                +">"
+                                + data1[2] +" </a>"
+
+                            );
+                            console.log("ANTES DE LA LLAMADA RECURSIVA")
+                            var uriSalida = "/csvEscalable/" + data1[3];
+                            $.ajax({
+                                type: "POST",
+                                url: uriSalida,
+                                //enctype: 'multipart/form-data',
+                                success: function(numAcortadas) {
+                                    //var total = 0;
+                                    $("#result2").html(
+                                        "<h3>El proceso ha sido completado. </h3>"
+                                        + "<h4>Numero de URI's totales: </h4>"
+                                        + data1[1]
+                                        + "<h5>Puede descargar su fichero desde el siguiente enlace </h5>"
+                                        + "<br><a href="
+                                        +data1[2]
+                                        +">"
+                                        + data1[2] + "</a>"
+                                    );
+                                    //window.location = '/delete';
+                                },
+                                error: function () {
+                                    $("#result2").html(
+                                        "<h3>Ha ocurrido un error con su fichero.</h3>");
+                                }
+                            });
+                        }
+                        else{
+                            console.log("NO ESCALABLE, RESPUESTA")
+                            $("#result2").html(
+
+                                "<h4>Numero URI's totales: </h4>"
+                                + data1[0]
+                                +"<h4>Numero URI's acortadas: </h4>"
+                                + data1[1]
+                                +
+                                "<br><a href="
+                                +data1[2]
+                                +">"
+                                + "DESCARGAR FICHERO </a>"
+
+
+                            );
+                        }
                         //window.location = '/delete';
                     },
                     error: function () {
