@@ -26,17 +26,10 @@ public class ClickRepositoryImpl implements ClickRepository {
     private static final Logger log = LoggerFactory
             .getLogger(ClickRepositoryImpl.class);
 
-    private static final RowMapper<Click> rowMapper = (rs, rowNum) -> {
-        try {
-            return new Click(rs.getLong("id"), rs.getString("hash"),
-                    rs.getDate("created"), rs.getString("referrer"),
-                    rs.getString("browser"), rs.getString("platform"),
-                    Crypt.decrypt(rs.getString("ip")), rs.getString("country"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    };
+    private static final RowMapper<Click> rowMapper = (rs, rowNum) -> new Click(rs.getLong("id"), rs.getString("hash"),
+            rs.getDate("created"), rs.getString("referrer"),
+            rs.getString("browser"), rs.getString("platform"),
+            Crypt.decrypt(rs.getString("ip")), rs.getString("country"));
 
     private JdbcTemplate jdbc;
 
@@ -70,11 +63,7 @@ public class ClickRepositoryImpl implements ClickRepository {
                 ps.setString(4, cl.getReferrer());
                 ps.setString(5, cl.getBrowser());
                 ps.setString(6, cl.getPlatform());
-                try {
-                    ps.setString(7, Crypt.encrypt(cl.getIp()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                ps.setString(7, Crypt.encrypt(cl.getIp()));
                 ps.setString(8, cl.getCountry());
                 return ps;
             }, holder);

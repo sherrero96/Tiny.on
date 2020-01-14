@@ -15,7 +15,7 @@ public class Crypt {
      * @return the text ecrypted
      * @throws Exception
      */
-    public static String encrypt(String strClearText) throws Exception{
+    public static String encrypt(String strClearText){
         String strData="";
 
         try {
@@ -33,7 +33,6 @@ public class Crypt {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception(e);
         }
         return strData;
     }
@@ -44,7 +43,7 @@ public class Crypt {
      * @return the plain text
      * @throws Exception
      */
-    public static String decrypt(String strEncrypted) throws Exception{
+    public static String decrypt(String strEncrypted){
         String strData="";
 
         try {
@@ -59,7 +58,6 @@ public class Crypt {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception(e);
         }
         return strData;
     }
