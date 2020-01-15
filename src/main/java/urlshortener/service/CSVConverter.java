@@ -1,5 +1,6 @@
 package urlshortener.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -38,18 +39,15 @@ public class CSVConverter {
      * Variables to initialize
      */
     private URIAvailable availableURI = new URIAvailable();
-    private final ShortURLRepository shortURLRepository;
-    private ShortURLService uris=null;
+
+    @Autowired
+    private ShortURLService uris;
 
     /**
      * Variables to save the result
      */
     private HashMap<String,String> resultados;
 
-
-    public CSVConverter(ShortURLRepository shortURLRepository) {
-        this.shortURLRepository = shortURLRepository;
-    }
 
     /**
      * Counters to know the number of uri's in a file
@@ -129,7 +127,6 @@ public class CSVConverter {
         uriCorrectas = 0;
         resultados = new LinkedHashMap<String,String>();
 
-        uris = new ShortURLService(this.shortURLRepository);
         try {
 
             br = new BufferedReader(nameFile);
@@ -219,7 +216,6 @@ public class CSVConverter {
         ShortURL link;
         uriCorrectas = 0;
         resultados = new LinkedHashMap<String, String>();
-        uris = new ShortURLService(this.shortURLRepository);
 
         String nombreFichero = "src/main/resources/static/csv/Salida_" + name;
         File file = new File(nombreFichero);
