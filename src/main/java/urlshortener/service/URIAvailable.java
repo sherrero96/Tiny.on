@@ -3,6 +3,7 @@ package urlshortener.service;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -111,6 +112,10 @@ public class URIAvailable {
      */
     private int getURIResponseGet(@NonNull String uri){
         // OKhttpClient to get the petition, with a timeout
+        UrlValidator urlValidator = new UrlValidator(new String[] { "http", "https" });
+        if(!urlValidator.isValid(uri)){
+            return -1;
+        }
         OkHttpClient client = new OkHttpClient.Builder()
                 .readTimeout(TIME_GET, TimeUnit.MILLISECONDS)
                 .build();

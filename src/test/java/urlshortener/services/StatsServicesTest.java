@@ -25,6 +25,7 @@ import urlshortener.service.StatsService;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -124,10 +125,6 @@ public class StatsServicesTest {
      */
     @Test
     public void statsNotEmptyReturnDataWithCacheIsFaster() throws IOException {
-        // Register a new click from localhost
-        clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug",
-                new Date(Calendar.getInstance().getTime().getTime()));
-
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
         // Create the request to the uri
@@ -135,23 +132,29 @@ public class StatsServicesTest {
                 .url("http://localhost:" + port + "/f656/stats")
                 .build();
 
-        // We call a petition
-        long timeBefore = System.currentTimeMillis();
-        Response response = client.newCall(request).execute();
-        long timeWithoutCache = System.currentTimeMillis() - timeBefore;
+        int timesThatCacheIsFaster = 0;
+        long timeBefore, timeWithoutCache, timeWithCache;
+        Response response;
+        int times = 15;
+        for(int i = 0; i < times; i++){
+            // New click for clean the cache
+            clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug",
+                    new Date(Calendar.getInstance().getTime().getTime()));
+            // Call petition without cache
+            timeBefore = System.currentTimeMillis();
+            response = client.newCall(request).execute();
+            timeWithoutCache = System.currentTimeMillis();
 
-        // We call a new petition with any update
-        OkHttpClient client2 = new OkHttpClient.Builder()
-                .build();
-        // Create the request to the uri
-        Request request2 = new Request.Builder()
-                .url("http://localhost:" + port + "/f656/stats")
-                .build();
-        timeBefore = System.currentTimeMillis();
-        response = client2.newCall(request2).execute();
-        long timeWithCache = System.currentTimeMillis() - timeBefore;
+            // New petition with cache, Faster?
+            timeBefore = System.currentTimeMillis();
+            response = client.newCall(request).execute();
+            timeWithCache = System.currentTimeMillis() - timeBefore;
 
-        assert timeWithoutCache > timeWithCache;
+            if(timeWithCache < timeWithoutCache)
+                timesThatCacheIsFaster++;
+        }
+
+        assert timesThatCacheIsFaster >= (times / 2);
 
     }
 

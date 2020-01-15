@@ -138,9 +138,11 @@ public class CSVConverter {
 
                 // use comma as separator
                 datos = line.split(SEPARATOR);
+                System.out.println(datos);
 
                 if (availableURI.isURIAvailable(datos[0])) {
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
                     resultados.put(datos[0], link.getUri().toString());
                     uriCorrectas++;
 
@@ -154,10 +156,10 @@ public class CSVConverter {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-
                 if(availableURI.isURIAvailable(datos[0])){
                     // resultado = llamada al recortador y que nos devuelva aqui el resultado uris.save(datos[0]);
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
                     resultados.put(datos[0],link.getUri().toString());
                     uriCorrectas++;
                 }
@@ -209,29 +211,30 @@ public class CSVConverter {
      * @return -1 in case of error. Return result > -1 in otherwise.
      * @throws IOException
      */
-    public int escalable(InputStreamReader nameFile, String name) throws IOException {
+    public int escalable(InputStreamReader nameFile, String name) throws IOException, IllegalArgumentException {
         BufferedReader br = null;
 
         String[] datos = null;
         String line = "";
         ShortURL link;
         uriCorrectas = 0;
-        resultados = new LinkedHashMap<String,String>();
+        resultados = new LinkedHashMap<String, String>();
         uris = new ShortURLService(this.shortURLRepository);
 
-        String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
+        String nombreFichero = "src/main/resources/static/csv/Salida_" + name;
         File file = new File(nombreFichero);
         boolean p = file.createNewFile();
         FileWriter fw = new FileWriter(file);
         try {
             br = new BufferedReader(nameFile);
 
-            if((line = br.readLine()) != null) {
+            if ((line = br.readLine()) != null) {
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-                if (availableURI.isURIAvailable(datos[0])) {
 
+                if (availableURI.isURIAvailable(datos[0])) {
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
 
                     String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
                     fw.append(prueba);
@@ -241,8 +244,7 @@ public class CSVConverter {
                     String prueba2 = datos[0] + ", " + "URI NO AVAILABLE" + "\n";
                     fw.append(prueba2);
                 }
-            }
-            else{
+            } else {
                 String prueba3 = "Fichero vacio" + "\n";
                 fw.append(prueba3);
             }
@@ -251,10 +253,10 @@ public class CSVConverter {
 
                 // use comma as separator
                 datos = line.split(SEPARATOR);
-
                 if (availableURI.isURIAvailable(datos[0])) {
 
                     link = uris.save(datos[0], "Twitter", "127.0.0.1");
+                    availableURI.saveURI(datos[0]);
 
                     String prueba = datos[0] + ", " + link.getUri().toString() + "\n";
                     fw.append(prueba);
@@ -272,8 +274,12 @@ public class CSVConverter {
             fw.close();
             return uriCorrectas;
 
+        } catch (IllegalArgumentException e) {
+            String prueba2 = datos[0] + ", " + "URI NO AVAILABLE" + "\n";
+            fw.append(prueba2);
+            return 0;
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return -1;
         } finally {
