@@ -123,6 +123,7 @@ public class QRCodeTest {
 	 * 
 	 */
 	@Test
+	@CacheEvict(value="qr", allEntries=true)
 	public void cache() {
 		QRCodeService qrCode = new QRCodeService();
 
