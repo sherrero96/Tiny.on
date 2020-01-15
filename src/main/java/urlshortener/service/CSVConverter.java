@@ -1,6 +1,7 @@
 package urlshortener.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -189,6 +190,8 @@ public class CSVConverter {
         System.out.println(name);
         String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
         File file = new File(nombreFichero);
+        File file2 = new ClassPathResource("csv/Salida" + name).getFile();
+        System.out.println("+++++++++++++++++++++++++" + file2.getAbsolutePath());
         boolean p = file.createNewFile();
         if(p){
             FileWriter fw = new FileWriter(file);
