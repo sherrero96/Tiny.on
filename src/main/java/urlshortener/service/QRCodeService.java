@@ -59,11 +59,20 @@ public class QRCodeService {
 	// Máximo número de veces que se intenta utilizar la API
 	private static final int MAX_REINTENTOS = 2;
 	
+	/**
+	 * QRCodeService with default API
+	 * 
+	 */
 	public QRCodeService() {
 		URL_QR_API = "https://api.qrserver.com/v1/create-qr-code/";
 		setCircuit();
 	}
 
+	/**
+	 * QRCodeService with specific API
+	 * 
+	 * @param api string that contains the API url
+	 */
 	public QRCodeService(@NonNull String api) {
 		URL_QR_API = api;
 		setCircuit();

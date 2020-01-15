@@ -54,12 +54,23 @@ public class UrlShortenerController {
     @Autowired
     private QRCodeService qrCode = new QRCodeService();
 
+    /**
+     * UrlShortenerController constructor
+     * @param shortUrlService ShortURLService that makes url shortener
+     * @param clickServcice ClickService that counts and saves stadistics
+     */
     public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, CSVConverter csv) {
         this.shortUrlService = shortUrlService;
         this.clickService = clickService;
         this.csv = csv;
     }
-
+    
+    /**
+     * Access shorten-url with specific id, update stadistics.
+     * @param id String that identifies short url
+     * @param request HttpServletRequest the request  
+     * @return HttpEntity
+     */
     @RequestMapping(value = "/{id:(?!link|index|stats|error404.html).*}", method = RequestMethod.GET)
     public ResponseEntity<?> redirectTo(@PathVariable String id, HttpServletRequest request) {
         ShortURL l = shortUrlService.findByKey(id);
@@ -77,6 +88,11 @@ public class UrlShortenerController {
         }
     }
 
+    /**
+     * Returns the QR code of given id
+     * @param id URI id to be encoded as QR     
+     * @return HttpEntity
+     */
     @RequestMapping(value = "/qr", method = RequestMethod.GET)
     public ResponseEntity<byte[]> qr(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
         ShortURL l = shortUrlService.findByKey(id);
@@ -93,7 +109,14 @@ public class UrlShortenerController {
 		}
     }
 
-
+    /**
+     * Save URI
+     * 
+     * @param url String url to be shortened
+     * @param sponsor String sponsor related to url
+     * @param request HttpServletRequest request     
+     * @return HttpEntity
+     */
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
                                               @RequestParam(value = "sponsor", required = false) String sponsor, HttpServletRequest request) {
@@ -146,6 +169,11 @@ public class UrlShortenerController {
         return result;
     }
 
+    /**
+     * Returns the plataform of the request
+     * @param request HttpServletRequest is the request
+     * @return String plataform, operative system of request
+     */
     private String extractPlatform(HttpServletRequest request){
         UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
         return userAgent.getOperatingSystem().getName();
