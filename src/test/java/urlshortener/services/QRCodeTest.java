@@ -123,31 +123,33 @@ public class QRCodeTest {
 	 * 
 	 */
 	@Test
-	@CacheEvict(value="{qr, lastStats}", allEntries=true)
 	public void cache() {
 		QRCodeService qrCode = new QRCodeService();
-		
-		final int NUM_TRIES = 10;
+
 		final String[] DOMAINS = {"com", "es", "it", "fr", "br", "de", "dk", "ge", "bo", "bg"};
-		//final String[] SITE = {"https://www.google.com", "https://www.twitter.com", "https://wwww.facebook.com",
-		// "https://wwww.habbo.com", "https://www.reddit.com", "https://www.unizar.es"};
+		final int NUM_TRIES = DOMAINS.length;
 		int hits = 0;
+		long behind, endFail, endHit;
 		for(int i = 0; i < NUM_TRIES; i++) {
-			long startFail = System.currentTimeMillis();
+			// First petition without cache
+			behind = System.currentTimeMillis();
 			qrCode.getQRImage("https://www.google." + DOMAINS[i]);
-			long endFail = System.currentTimeMillis();
+			endFail = System.currentTimeMillis() - behind;
 
-			long startHit = System.currentTimeMillis();
+			// Second petition with cache
+			behind = System.currentTimeMillis();
 			qrCode.getQRImage("https://www.google." + DOMAINS[i]);
-			long endHit = System.currentTimeMillis();
+			endHit = System.currentTimeMillis() - behind;
 
-			if (endHit - startHit < endFail - startFail) {
+			if (endHit < endFail) {
 				hits++;
 			}
 		}
 
 		// Could be more robust
-		assertTrue(hits > NUM_TRIES / 2);
+		System.out.println("Veces acertadas -> " + hits);
+		assert hits > (NUM_TRIES / 2);
+
 	}
 
 	/** Private functions used in tests */
