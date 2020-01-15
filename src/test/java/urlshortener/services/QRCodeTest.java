@@ -135,15 +135,10 @@ public class QRCodeTest {
 		for(int i = 0; i < NUM_TRIES; i++) {
 			long startFail = System.currentTimeMillis();
 			qrCode.getQRImage("https://www.google." + DOMAINS[i]);
-			qrCode.getQRImage(SITE[i]);
-			
 			long endFail = System.currentTimeMillis();
 
 			long startHit = System.currentTimeMillis();
 			qrCode.getQRImage("https://www.google." + DOMAINS[i]);
-			qrCode.getQRImage(SITE[i]);
-
-			
 			long endHit = System.currentTimeMillis();
 
 			if (endHit - startHit < endFail - startFail) {
