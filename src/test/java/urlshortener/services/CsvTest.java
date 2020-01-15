@@ -38,11 +38,11 @@ public class CsvTest {
 
     @Value("${converter.test.1:classpath:csv/Test1.csv}")
     private Resource test1;
-    @Value("${converter.test.2:classpath:csv/Test2.csv}")
+    @Value("${converter.test.1:classpath:csv/Test2.csv}")
     private Resource test2;
-    @Value("${converter.test.3:classpath:csv/Test3.csv}")
+    @Value("${converter.test.1:classpath:csv/Test3.csv}")
     private Resource test3;
-    @Value("${converter.test.4:classpath:csv/Test4.csv}")
+    @Value("${converter.test.1:classpath:csv/Test4.csv}")
     private Resource test4;
 
 
