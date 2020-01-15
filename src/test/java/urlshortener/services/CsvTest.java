@@ -98,7 +98,7 @@ public class CsvTest {
 
             String line = br.readLine();
             datos = line.split(SEPARATOR);
-            assertEquals(datos[0],"Fichero vac�o");
+            assertEquals(datos[0],"Fichero vacio");
             String filename = "src/main/resources/static/csv/Salida_Test3.csv";
             File file = new File(filename);
             file.delete();

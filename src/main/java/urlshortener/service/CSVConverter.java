@@ -155,7 +155,7 @@ public class CSVConverter {
                 }
             }
             else{
-                resultados.put("Fichero vacío","");
+                resultados.put("Fichero vacio","");
             }
             while ((line = br.readLine()) != null) {
                 // use comma as separator
