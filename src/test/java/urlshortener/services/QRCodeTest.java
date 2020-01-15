@@ -104,7 +104,6 @@ public class QRCodeTest {
 	/**
 	 * Simulates API shut down so circuit will have to be open 
 	 *
-	 * @return
 	 */
 	@Test
 	public void forceOpenCircuit() {
@@ -119,25 +118,50 @@ public class QRCodeTest {
 		assertEquals("OPEN", qrBadAPI.getCircuitState());
 	}
 
-/*	@Test
-	@CacheEvict(value="qr", allEntries=true)
+	/**
+	 * Checks cached data is obtained in less time rather than when it's not
+	 * 
+	 */
+	@Test
+	@CacheEvict(value="{qr, lastStats}", allEntries=true)
 	public void cache() {
 		QRCodeService qrCode = new QRCodeService();
 		
-		long start_fail = System.currentTimeMillis();
-		qrCode.getQRImage("https://www.google.com");
-		long end_fail = System.currentTimeMillis();
+		final int NUM_TRIES = 10;
+		final String[] DOMAINS = {"com", "es", "it", "fr", "br", "de", "dk", "ge", "bo", "bg"};
+		//final String[] SITE = {"https://www.google.com", "https://www.twitter.com", "https://wwww.facebook.com",
+		// "https://wwww.habbo.com", "https://www.reddit.com", "https://www.unizar.es"};
+		int hits = 0;
+		for(int i = 0; i < NUM_TRIES; i++) {
+			long startFail = System.currentTimeMillis();
+			qrCode.getQRImage("https://www.google." + DOMAINS[i]);
+			qrCode.getQRImage(SITE[i]);
+			
+			long endFail = System.currentTimeMillis();
 
-		long start_hit = System.currentTimeMillis();
-		qrCode.getQRImage("https://www.google.com");
-		long end_hit = System.currentTimeMillis();
+			long startHit = System.currentTimeMillis();
+			qrCode.getQRImage("https://www.google." + DOMAINS[i]);
+			qrCode.getQRImage(SITE[i]);
+
+			
+			long endHit = System.currentTimeMillis();
+
+			if (endHit - startHit < endFail - startFail) {
+				hits++;
+			}
+		}
 
 		// Could be more robust
-		assertTrue((end_hit - start_hit) < (end_fail - start_fail));
+		assertTrue(hits > NUM_TRIES / 2);
 	}
-*/
 
 	/** Private functions used in tests */
+	/**
+	 * Decoded given QR as a byte array 
+	 * 
+	 * @param image is the image encoded
+	 * @return QR content as String
+	 */
 	private String decode(byte[] image) {
 		try {
 			BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(image));
