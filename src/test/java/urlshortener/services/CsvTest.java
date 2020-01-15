@@ -58,7 +58,7 @@ public class CsvTest {
 
 
             assertEquals(total,8);
-            System.out.println("Expected 6 but was: " + csvCon.acortadas());
+            System.out.println("Expected 5 but was: " + csvCon.acortadas());
             assertEquals(5, csvCon.acortadas());
 
 
