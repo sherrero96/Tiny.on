@@ -124,6 +124,7 @@ public class StatsServicesTest {
      * @throws IOException
      */
     @Test
+    @CacheEvict(value="{qr, lastStats}", allEntries=true)
     public void statsNotEmptyReturnDataWithCacheIsFaster() throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
