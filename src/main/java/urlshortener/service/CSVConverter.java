@@ -191,7 +191,7 @@ public class CSVConverter {
             System.out.println(name);
             String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
             File file = new File(nombreFichero);
-            System.out.println("+++++++++++++++++++++++++" + file.getAbsolutePath());
+            System.out.println("+++++++++++++++++++++++++" + file.canWrite());
             boolean p = file.createNewFile();
             if(p){
                 FileWriter fw = new FileWriter(file);
