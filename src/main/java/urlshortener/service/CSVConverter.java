@@ -1,7 +1,9 @@
 package urlshortener.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Service
 public class CSVConverter {
+
+    @Value("${converter.1:classpath:csv}")
+    private Resource path;
+
     /**
      * Separator of strings in CSV file.
      */
@@ -192,8 +198,8 @@ public class CSVConverter {
             String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
             File file = new File(nombreFichero);
             System.out.println("+++++++++++++++++++++++++" + file.canWrite());
-            boolean p = file.createNewFile();
-            if(p){
+            //boolean p = file.createNewFile();
+            if(true){
                 FileWriter fw = new FileWriter(file);
                 for(Map.Entry<String,String> entry : resultados.entrySet()){
 
