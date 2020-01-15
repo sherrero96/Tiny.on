@@ -58,8 +58,9 @@ public class CsvTest {
 
 
             assertEquals(total,8);
-            assertEquals(5, csvCon.acortadas());
             System.out.println("Expected 6 but was: " + csvCon.acortadas());
+            assertEquals(5, csvCon.acortadas());
+
 
             String filename = "src/main/resources/static/csv/Salida_Test1.csv";
             File file = new File(filename);
