@@ -126,7 +126,8 @@ public class QRCodeTest {
 	public void cache() {
 		QRCodeService qrCode = new QRCodeService();
 
-		final String[] DOMAINS = {"com", "es", "it", "fr", "br", "de", "dk", "ge", "bo", "bg"};
+		final String[] DOMAINS = {"com", "es", "it", "fr", "br", "de", "dk", "ge", "bo", "bg", "ie", "lt", "pt", "se",
+            "ua"};
 		final int NUM_TRIES = DOMAINS.length;
 		int hits = 0;
 		long behind, endFail, endHit;
@@ -141,7 +142,7 @@ public class QRCodeTest {
 			qrCode.getQRImage("https://www.google." + DOMAINS[i]);
 			endHit = System.currentTimeMillis() - behind;
 
-			if (endHit < endFail) {
+			if (endHit <= endFail) {
 				hits++;
 			}
 		}
