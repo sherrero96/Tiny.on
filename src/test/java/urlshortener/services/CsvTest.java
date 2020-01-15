@@ -38,11 +38,11 @@ public class CsvTest {
 
     @Value("${converter.test.1:classpath:csv/Test1.csv}")
     private Resource test1;
-    @Value("${converter.test.1:classpath:csv/Test2.csv}")
+    @Value("${converter.test.2:classpath:csv/Test2.csv}")
     private Resource test2;
-    @Value("${converter.test.1:classpath:csv/Test3.csv}")
+    @Value("${converter.test.3:classpath:csv/Test3.csv}")
     private Resource test3;
-    @Value("${converter.test.1:classpath:csv/Test4.csv}")
+    @Value("${converter.test.4:classpath:csv/Test4.csv}")
     private Resource test4;
 
 
@@ -98,7 +98,7 @@ public class CsvTest {
 
             String line = br.readLine();
             datos = line.split(SEPARATOR);
-            assertEquals(datos[0],"Fichero vacío");
+            assertEquals(datos[0],"Fichero vac�o");
             String filename = "src/main/resources/static/csv/Salida_Test3.csv";
             File file = new File(filename);
             file.delete();
