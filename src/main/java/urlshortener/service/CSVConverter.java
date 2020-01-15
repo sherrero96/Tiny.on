@@ -197,7 +197,14 @@ public class CSVConverter {
             System.out.println(name);
             String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
             File file = new File(nombreFichero);
-            boolean p = file.createNewFile();
+            if(!file.getParentFile().exists()){
+                file.getParentFile().mkdirs();
+            }
+            boolean p = true;
+            if(!file.exists()){
+                p = file.createNewFile();
+            }
+
             if(p){
                 FileWriter fw = new FileWriter(file);
                 for(Map.Entry<String,String> entry : resultados.entrySet()){
