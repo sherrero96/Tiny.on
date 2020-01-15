@@ -126,7 +126,7 @@ public class QRCodeTest {
 	public void cache() {
 		QRCodeService qrCode = new QRCodeService();
 
-		final String[] DOMAINS = {"com", "es", "it", "fr", "br", "de", "dk", "ge", "bo", "bg", "ie", "lt", "pt", "se",
+		final String[] DOMAINS = {"fi", "es", "it", "fr", "br", "de", "dk", "ge", "bo", "bg", "ie", "lt", "pt", "se",
             "ua"};
 		final int NUM_TRIES = DOMAINS.length;
 		int hits = 0;
