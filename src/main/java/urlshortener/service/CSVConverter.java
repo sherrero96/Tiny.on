@@ -190,8 +190,7 @@ public class CSVConverter {
         System.out.println(name);
         String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
         File file = new File(nombreFichero);
-        File file2 = new ClassPathResource("csv/Salida" + name).getFile();
-        System.out.println("+++++++++++++++++++++++++" + file2.getAbsolutePath());
+        System.out.println("+++++++++++++++++++++++++" + file.getAbsolutePath());
         boolean p = file.createNewFile();
         if(p){
             FileWriter fw = new FileWriter(file);
@@ -200,6 +199,8 @@ public class CSVConverter {
                 fw.append(entry.getKey()).append(", ").append(entry.getValue()).append("\n");
             }
             fw.close();
+        }else{
+            System.err.println("No se ha podido abrir el fichero de escritura");
         }
     }
 
