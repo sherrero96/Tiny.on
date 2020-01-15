@@ -186,21 +186,26 @@ public class CSVConverter {
      * @param name is name of file.
      * @throws IOException
      */
-    public void guardar(String name) throws IOException {
-        System.out.println(name);
-        String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
-        File file = new File(nombreFichero);
-        System.out.println("+++++++++++++++++++++++++" + file.getAbsolutePath());
-        boolean p = file.createNewFile();
-        if(p){
-            FileWriter fw = new FileWriter(file);
-            for(Map.Entry<String,String> entry : resultados.entrySet()){
+    public void guardar(String name) {
+        try{
+            System.out.println(name);
+            String nombreFichero = "src/main/resources/static/csv/Salida_" + name ;
+            File file = new File(nombreFichero);
+            System.out.println("+++++++++++++++++++++++++" + file.getAbsolutePath());
+            boolean p = file.createNewFile();
+            if(p){
+                FileWriter fw = new FileWriter(file);
+                for(Map.Entry<String,String> entry : resultados.entrySet()){
 
-                fw.append(entry.getKey()).append(", ").append(entry.getValue()).append("\n");
+                    fw.append(entry.getKey()).append(", ").append(entry.getValue()).append("\n");
+                }
+                fw.close();
+            }else{
+                System.err.println("No se ha podido abrir el fichero de escritura");
             }
-            fw.close();
-        }else{
-            System.err.println("No se ha podido abrir el fichero de escritura");
+        } catch (IOException e) {
+            System.out.print("ERROR! ");
+            e.printStackTrace();
         }
     }
 
