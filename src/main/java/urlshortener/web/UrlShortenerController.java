@@ -192,7 +192,8 @@ public class UrlShortenerController {
         }
         if(total > 1) {
             InputCsv = new InputStreamReader(file.getInputStream());
-            String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
+            String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+            String respuestaDescarga = baseUrl + "/download/" + nombreFichero;
             String resultadoEscalable = "escalable," + total + "," + respuestaDescarga + "," + nombreFichero;
             return resultadoEscalable;
 
@@ -203,8 +204,8 @@ public class UrlShortenerController {
         int acortadas = csv.acortadas();
 
         csv.guardar(nombreFichero);
-
-        String respuestaDescarga = "http://localhost:8080/download/" + nombreFichero;
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String respuestaDescarga = baseUrl + "/download/" + nombreFichero;
         String resultado = total + "," + respuestaDescarga;
         return resultado;
 
