@@ -135,8 +135,8 @@ public class StatsServicesTest {
         int timesThatCacheIsFaster = 0;
         long timeBefore, timeWithoutCache, timeWithCache;
         Response response;
-        int times = 10;
-        for(int i = 0; i < 10; i++){
+        int times = 15;
+        for(int i = 0; i < times; i++){
             // New click for clean the cache
             clickService.saveClick("f656", "127.0.0.1", "Spain", "Debug",
                     new Date(Calendar.getInstance().getTime().getTime()));
@@ -154,7 +154,6 @@ public class StatsServicesTest {
                 timesThatCacheIsFaster++;
         }
 
-        System.out.println("--------------------------------- veces: " + timesThatCacheIsFaster);
         assert timesThatCacheIsFaster >= (times / 2);
 
     }
